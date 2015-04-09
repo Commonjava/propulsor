@@ -17,12 +17,12 @@ public class AppLifecycleManager {
     protected AppLifecycleManager() {
     }
 
-    public AppLifecycleManager(List<ShutdownAction> shutdownActions) {
+    public AppLifecycleManager(final List<ShutdownAction> shutdownActions) {
         this.shutdownActions = shutdownActions;
     }
 
     public void stop() {
-        for (ShutdownAction shutdownAction : shutdownActions) {
+        for (final ShutdownAction shutdownAction : shutdownActions) {
             shutdownAction.shutdown();
         }
     }
@@ -30,14 +30,23 @@ public class AppLifecycleManager {
     @PostConstruct
     public void initCDI() {
         shutdownActions = new ArrayList<>();
-        for (ShutdownAction shutdownAction : shutdownActionInstances) {
+        for (final ShutdownAction shutdownAction : shutdownActionInstances) {
             shutdownActions.add(shutdownAction);
         }
     }
 
     public void installShutdownHook() {
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+        Runtime.getRuntime()
+               .addShutdownHook( new Thread( new ShutdownRunnable() ) );
+    }
+
+    private final class ShutdownRunnable
+        implements Runnable
+    {
+        @Override
+        public void run()
+        {
             stop();
-        }));
+        }
     }
 }

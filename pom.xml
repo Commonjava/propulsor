@@ -20,7 +20,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <resteasyVersion>3.0.9.Final</resteasyVersion>
     <undertowVersion>1.1.2.Final</undertowVersion>
-    <javaVersion>1.8</javaVersion>
+    <javaVersion>1.7</javaVersion>
   </properties>
 
   <dependencyManagement>

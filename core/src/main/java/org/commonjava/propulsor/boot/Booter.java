@@ -13,7 +13,6 @@ import org.codehaus.plexus.interpolation.InterpolationException;
 import org.commonjava.propulsor.config.Configurator;
 import org.commonjava.propulsor.config.ConfiguratorException;
 import org.commonjava.propulsor.deploy.Deployer;
-import org.commonjava.propulsor.deploy.DeployerException;
 import org.commonjava.propulsor.lifecycle.AppLifecycleManager;
 import org.jboss.weld.environment.se.Weld;
 import org.jboss.weld.environment.se.WeldContainer;
@@ -24,11 +23,11 @@ public class Booter {
 
     private static final String BOOT_DEFAULTS_PROP = "boot.properties";
 
-    public static void main(String[] args) {
+    public static void main(final String[] args) {
         BootOptions options = null;
         try {
             options = loadBootOptions();
-        } catch (BootException e) {
+        } catch (final BootException e) {
             e.printStackTrace();
             System.err.println(e.getMessage());
             System.exit(ERR_LOAD_FROM_SYSPROPS);
@@ -36,7 +35,7 @@ public class Booter {
 
         try {
             options.parseArgs(args);
-        } catch (BootException e) {
+        } catch (final BootException e) {
             e.printStackTrace();
             System.err.println(e.getMessage());
             System.exit(ERR_PARSE_ARGS);
@@ -45,7 +44,7 @@ public class Booter {
         BootStatus status = null;
         try {
             status = new Booter().runAndWait(options);
-        } catch (BootException e) {
+        } catch (final BootException e) {
             e.printStackTrace();
             System.err.println(e.getMessage());
             System.exit(ERR_STARTING);
@@ -65,9 +64,9 @@ public class Booter {
             bootDefaults = new File(bootDef);
         }
 
-        ServiceLoader<BootOptions> loader = ServiceLoader
+        final ServiceLoader<BootOptions> loader = ServiceLoader
                 .load(BootOptions.class);
-        BootOptions options = loader.iterator().next();
+        final BootOptions options = loader.iterator().next();
 
         try {
             String home = System.getProperty(options.getHomeSystemProperty());
@@ -152,11 +151,7 @@ public class Booter {
 
     public boolean deploy() {
         deployer = container.instance().select(Deployer.class).get();
-        try {
-            status = deployer.deploy();
-        } catch (DeployerException e) {
-            status = new BootStatus(ERR_STARTING, e);
-        }
+        status = deployer.deploy( options );
 
         return status == null ? false : status.isSuccess();
     }
@@ -176,7 +171,7 @@ public class Booter {
         configurator = container.instance().select(Configurator.class).get();
         try {
             configurator.load(options);
-        } catch (ConfiguratorException e) {
+        } catch (final ConfiguratorException e) {
             status.markFailed(ERR_LOAD_CONFIG, e);
         }
     }

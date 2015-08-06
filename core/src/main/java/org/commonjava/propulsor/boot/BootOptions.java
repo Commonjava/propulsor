@@ -48,10 +48,19 @@ public abstract class BootOptions {
 
     public abstract String getHomeEnvar();
 
+    protected BootOptions()
+    {
+    }
+
+    protected BootOptions( final String homeDir )
+    {
+        this.homeDir = homeDir;
+    }
+
     protected void loadApplicationOptions() {
     }
 
-    protected void setApplicationSystemProperties(Properties properties) {
+    protected void setApplicationSystemProperties(final Properties properties) {
     }
 
     public void load(final File bootDefaults, final String home)

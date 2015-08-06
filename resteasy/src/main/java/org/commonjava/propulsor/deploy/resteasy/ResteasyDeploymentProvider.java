@@ -32,6 +32,8 @@ import org.commonjava.propulsor.deploy.resteasy.helper.RequestScopeListener;
 import org.commonjava.propulsor.deploy.undertow.UndertowDeploymentProvider;
 import org.jboss.resteasy.plugins.server.servlet.HttpServlet30Dispatcher;
 import org.jboss.resteasy.spi.ResteasyDeployment;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 // TODO: Is it really right to make this extend Application?? Not sure...
 public class ResteasyDeploymentProvider
@@ -39,11 +41,16 @@ public class ResteasyDeploymentProvider
     implements UndertowDeploymentProvider
 {
 
+    private final Logger logger = LoggerFactory.getLogger( getClass() );
+
     @Inject
     private Instance<RestResources> resources;
 
     @Inject
     private Instance<RestProvider> providers;
+
+    @Inject
+    private ResteasyAppConfig config;
 
     private Set<Class<?>> resourceClasses;
 
@@ -53,10 +60,12 @@ public class ResteasyDeploymentProvider
     {
     }
 
-    public ResteasyDeploymentProvider( final Set<Class<?>> resourceClasses, final Set<Class<?>> providerClasses )
+    public ResteasyDeploymentProvider( final Set<Class<?>> resourceClasses, final Set<Class<?>> providerClasses,
+                                       final ResteasyAppConfig config )
     {
         this.resourceClasses = resourceClasses;
         this.providerClasses = providerClasses;
+        this.config = config;
     }
 
     @PostConstruct
@@ -92,8 +101,7 @@ public class ResteasyDeploymentProvider
         final ServletInfo resteasyServlet = Servlets.servlet( "REST", HttpServlet30Dispatcher.class )
                                                     .setAsyncSupported( true )
                                                     .setLoadOnStartup( 1 )
-                                                    .addMapping( "/api*" )
-                                                    .addMapping( "/api/*" );
+                                                    .addMappings( config.getJaxRsMappings() );
 
         return new DeploymentInfo().addListener( Servlets.listener( RequestScopeListener.class ) )
                                    .addServletContextAttribute( ResteasyDeployment.class.getName(), deployment )

@@ -24,6 +24,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ServiceLoader;
 
+import javax.enterprise.inject.Instance;
+
 import org.codehaus.plexus.interpolation.InterpolationException;
 import org.commonjava.propulsor.config.Configurator;
 import org.commonjava.propulsor.config.ConfiguratorException;
@@ -34,80 +36,102 @@ import org.jboss.weld.environment.se.WeldContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class Booter {
+public class Booter
+{
 
     private static final String BOOT_DEFAULTS_PROP = "boot.properties";
 
-    public static void main(final String[] args) {
+    public static void main( final String[] args )
+    {
         BootOptions options = null;
-        try {
+        try
+        {
             options = loadBootOptions();
-        } catch (final BootException e) {
+        }
+        catch ( final BootException e )
+        {
             e.printStackTrace();
-            System.err.println(e.getMessage());
-            System.exit(ERR_LOAD_FROM_SYSPROPS);
+            System.err.println( e.getMessage() );
+            System.exit( ERR_LOAD_FROM_SYSPROPS );
         }
 
-        try {
-            options.parseArgs(args);
-        } catch (final BootException e) {
+        try
+        {
+            options.parseArgs( args );
+        }
+        catch ( final BootException e )
+        {
             e.printStackTrace();
-            System.err.println(e.getMessage());
-            System.exit(ERR_PARSE_ARGS);
+            System.err.println( e.getMessage() );
+            System.exit( ERR_PARSE_ARGS );
         }
 
         BootStatus status = null;
-        try {
-            status = new Booter().runAndWait(options);
-        } catch (final BootException e) {
+        try
+        {
+            status = new Booter().runAndWait( options );
+        }
+        catch ( final BootException e )
+        {
             e.printStackTrace();
-            System.err.println(e.getMessage());
-            System.exit(ERR_STARTING);
+            System.err.println( e.getMessage() );
+            System.exit( ERR_STARTING );
         }
 
-        if (status.isFailed()) {
-            status.getError().printStackTrace();
-            System.err.println(status.getError().getMessage());
-            System.exit(status.getExitCode());
+        if ( status.isFailed() )
+        {
+            status.getError()
+                  .printStackTrace();
+            System.err.println( status.getError()
+                                      .getMessage() );
+            System.exit( status.getExitCode() );
         }
     }
 
-    private static BootOptions loadBootOptions() throws BootException {
-        final String bootDef = System.getProperty(BOOT_DEFAULTS_PROP);
+    private static BootOptions loadBootOptions()
+        throws BootException
+    {
+        final String bootDef = System.getProperty( BOOT_DEFAULTS_PROP );
         File bootDefaults = null;
-        if (bootDef != null) {
-            bootDefaults = new File(bootDef);
+        if ( bootDef != null )
+        {
+            bootDefaults = new File( bootDef );
         }
 
-        final ServiceLoader<BootOptions> loader = ServiceLoader
-                .load(BootOptions.class);
-        final BootOptions options = loader.iterator().next();
+        final ServiceLoader<BootOptions> loader = ServiceLoader.load( BootOptions.class );
+        final BootOptions options = loader.iterator()
+                                          .next();
 
-        try {
-            String home = System.getProperty(options.getHomeSystemProperty());
+        try
+        {
+            String home = System.getProperty( options.getHomeSystemProperty() );
 
-            if (home == null) {
-                home = System.getenv(options.getHomeEnvar());
+            if ( home == null )
+            {
+                home = System.getenv( options.getHomeEnvar() );
             }
 
-            if (home == null) {
-                home = new File(".").getCanonicalPath();
+            if ( home == null )
+            {
+                home = new File( "." ).getCanonicalPath();
             }
 
-            options.load(bootDefaults, home);
+            options.load( bootDefaults, home );
             return options;
-        } catch (final IOException e) {
-            throw new BootException(
-                    "ERROR LOADING BOOT DEFAULTS: %s.\nReason: %s\n\n", e,
-                    bootDefaults, e.getMessage());
-        } catch (final InterpolationException e) {
-            throw new BootException(
-                    "ERROR RESOLVING BOOT DEFAULTS: %s.\nReason: %s\n\n", e,
-                    bootDefaults, e.getMessage());
+        }
+        catch ( final IOException e )
+        {
+            throw new BootException( "ERROR LOADING BOOT DEFAULTS: %s.\nReason: %s\n\n", e, bootDefaults,
+                                     e.getMessage() );
+        }
+        catch ( final InterpolationException e )
+        {
+            throw new BootException( "ERROR RESOLVING BOOT DEFAULTS: %s.\nReason: %s\n\n", e, bootDefaults,
+                                     e.getMessage() );
         }
     }
 
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private final Logger logger = LoggerFactory.getLogger( getClass() );
 
     private BootOptions options;
 
@@ -123,57 +147,73 @@ public class Booter {
 
     private AppLifecycleManager lifecycleManager;
 
-    private void initialize(final BootOptions options) throws BootException {
+    private void initialize( final BootOptions options )
+        throws BootException
+    {
         this.options = options;
 
-        try {
+        try
+        {
             options.setSystemProperties();
 
             weld = new Weld();
             container = weld.initialize();
-        } catch (final RuntimeException e) {
-            throw new BootException("Failed to initialize Booter: "
-                    + e.getMessage(), e);
+        }
+        catch ( final RuntimeException e )
+        {
+            throw new BootException( "Failed to initialize Booter: " + e.getMessage(), e );
         }
     }
 
-    public BootStatus runAndWait(final BootOptions bootOptions)
-            throws BootException {
-        start(bootOptions);
+    public BootStatus runAndWait( final BootOptions bootOptions )
+        throws BootException
+    {
+        start( bootOptions );
 
-        logger.info("Setting up shutdown hook...");
+        logger.info( "Setting up shutdown hook..." );
         lifecycleManager.installShutdownHook();
 
-        synchronized (deployer) {
-            try {
+        synchronized ( deployer )
+        {
+            try
+            {
                 deployer.wait();
-            } catch (final InterruptedException e) {
+            }
+            catch ( final InterruptedException e )
+            {
                 e.printStackTrace();
-                logger.info("AProx exiting");
+                logger.info( "AProx exiting" );
             }
         }
 
         return status;
     }
 
-    public WeldContainer getContainer() {
+    public WeldContainer getContainer()
+    {
         return container;
     }
 
-    public BootOptions getBootOptions() {
+    public BootOptions getBootOptions()
+    {
         return options;
     }
 
-    public boolean deploy() {
-        deployer = container.instance().select(Deployer.class).get();
+    public boolean deploy()
+    {
+        deployer = container.instance()
+                            .select( Deployer.class )
+                            .get();
         status = deployer.deploy( options );
 
         return status == null ? false : status.isSuccess();
     }
 
-    public BootStatus start(final BootOptions bootOptions) throws BootException {
-        initialize(bootOptions);
-        logger.info("Booter running: " + this);
+    public BootStatus start( final BootOptions bootOptions )
+        throws BootException
+    {
+        initialize( bootOptions );
+        logger.info( "Booter running: " + this );
 
         configure();
         startLifecycle();
@@ -182,24 +222,49 @@ public class Booter {
         return status;
     }
 
-    public void configure() {
-        configurator = container.instance().select(Configurator.class).get();
-        try {
-            configurator.load(options);
-        } catch (final ConfiguratorException e) {
-            status.markFailed(ERR_LOAD_CONFIG, e);
+    public void configure()
+    {
+        final Instance<Configurator> selection = container.instance()
+                                                          .select( Configurator.class );
+        if ( !selection.iterator()
+                       .hasNext() )
+        {
+            return;
+        }
+
+        configurator = selection.get();
+        try
+        {
+            configurator.load( options );
+        }
+        catch ( final ConfiguratorException e )
+        {
+            status.markFailed( ERR_LOAD_CONFIG, e );
         }
     }
 
-    public void startLifecycle() {
-        lifecycleManager = container.instance()
-                .select(AppLifecycleManager.class).get();
+    public void startLifecycle()
+    {
+        final Instance<AppLifecycleManager> selection = container.instance()
+                                                                 .select( AppLifecycleManager.class );
+        if ( !selection.iterator()
+                       .hasNext() )
+        {
+            return;
+        }
+
+        lifecycleManager = selection.get();
     }
 
-    public void stop() {
-        if (container != null) {
+    public void stop()
+    {
+        if ( container != null )
+        {
             deployer.stop();
-            lifecycleManager.stop();
+            if ( lifecycleManager != null )
+            {
+                lifecycleManager.stop();
+            }
             weld.shutdown();
         }
     }

@@ -17,6 +17,7 @@ package org.commonjava.propulsor.deploy.undertow.util;
 
 import io.undertow.security.api.AuthenticationMechanismFactory;
 import io.undertow.security.api.NotificationReceiver;
+import io.undertow.server.HandlerWrapper;
 import io.undertow.server.session.SessionListener;
 import io.undertow.servlet.ServletExtension;
 import io.undertow.servlet.api.DeploymentInfo;
@@ -25,6 +26,7 @@ import io.undertow.servlet.api.FilterInfo;
 import io.undertow.servlet.api.FilterMappingInfo;
 import io.undertow.servlet.api.LifecycleInterceptor;
 import io.undertow.servlet.api.ListenerInfo;
+import io.undertow.servlet.api.LoginConfig;
 import io.undertow.servlet.api.MimeMapping;
 import io.undertow.servlet.api.SecurityConstraint;
 import io.undertow.servlet.api.ServletContainerInitializerInfo;
@@ -35,9 +37,12 @@ import java.util.Map;
 import java.util.Set;
 
 import org.commonjava.propulsor.deploy.undertow.UndertowDeploymentProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public final class DeploymentInfoUtils
 {
+    private static final Logger logger = LoggerFactory.getLogger( DeploymentInfoUtils.class );
 
     private DeploymentInfoUtils()
     {
@@ -48,7 +53,9 @@ public final class DeploymentInfoUtils
     {
         for ( final UndertowDeploymentProvider fromProvider : fromProviders )
         {
+            logger.debug( "Merging info from deployment provider: {}", fromProvider );
             final DeploymentInfo from = fromProvider.getDeploymentInfo();
+            logger.debug( "Got: {} from: {}", from, fromProvider );
             merge( into, from );
         }
     }
@@ -129,6 +136,7 @@ public final class DeploymentInfoUtils
         {
             for ( final Map.Entry<String, String> entry : initParameters.entrySet() )
             {
+                logger.debug( "Init-Param: {} = {} from: {}", entry.getKey(), entry.getValue(), from );
                 into.addInitParameter( entry.getKey(), entry.getValue() );
             }
         }
@@ -146,11 +154,6 @@ public final class DeploymentInfoUtils
         if ( listeners != null )
         {
             into.addListeners( listeners );
-        }
-
-        if ( from.getLoginConfig() != null )
-        {
-            into.setLoginConfig( from.getLoginConfig() );
         }
 
         if ( from.getMetricsCollector() != null )
@@ -182,7 +185,27 @@ public final class DeploymentInfoUtils
         final List<SecurityConstraint> securityConstraints = from.getSecurityConstraints();
         if ( securityConstraints != null )
         {
+            if ( logger.isDebugEnabled() )
+            {
+                for ( final SecurityConstraint sc : securityConstraints )
+                {
+                    logger.debug( "Security Constraint: {} from: {}", sc, from );
+                }
+            }
             into.addSecurityConstraints( securityConstraints );
+        }
+
+        final LoginConfig loginConfig = from.getLoginConfig();
+        if ( loginConfig != null )
+        {
+            logger.debug( "Login Config with realm: {} and mechanism: {} from: {}", loginConfig.getRealmName(),
+                          loginConfig.getAuthMethods(), from );
+            if ( into.getLoginConfig() != null )
+            {
+                throw new IllegalStateException(
+                                                 "Two or more deployment providers are attempting to provide login configurations! Enable debug logging to see more." );
+            }
+            into.setLoginConfig( loginConfig );
         }
 
         if ( from.getSecurityContextFactory() != null )
@@ -255,6 +278,33 @@ public final class DeploymentInfoUtils
         if ( welcomePages != null )
         {
             into.addWelcomePages( welcomePages );
+        }
+
+        final List<HandlerWrapper> initWrappers = from.getInitialHandlerChainWrappers();
+        if ( initWrappers != null )
+        {
+            for ( final HandlerWrapper wrapper : initWrappers )
+            {
+                into.addInitialHandlerChainWrapper( wrapper );
+            }
+        }
+
+        final List<HandlerWrapper> outerWrappers = from.getOuterHandlerChainWrappers();
+        if ( outerWrappers != null )
+        {
+            for ( final HandlerWrapper wrapper : outerWrappers )
+            {
+                into.addOuterHandlerChainWrapper( wrapper );
+            }
+        }
+
+        final List<HandlerWrapper> innerWrappers = from.getInnerHandlerChainWrappers();
+        if ( innerWrappers != null )
+        {
+            for ( final HandlerWrapper wrapper : innerWrappers )
+            {
+                into.addInnerHandlerChainWrapper( wrapper );
+            }
         }
     }
 

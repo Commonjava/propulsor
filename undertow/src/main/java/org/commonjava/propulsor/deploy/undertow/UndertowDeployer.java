@@ -24,6 +24,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import javax.annotation.PostConstruct;
+import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 import javax.servlet.ServletException;
@@ -33,6 +34,7 @@ import org.commonjava.propulsor.boot.BootStatus;
 import org.commonjava.propulsor.deploy.Deployer;
 import org.commonjava.propulsor.deploy.undertow.util.DeploymentInfoUtils;
 
+@ApplicationScoped
 public class UndertowDeployer
     implements Deployer
 {

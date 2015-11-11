@@ -25,6 +25,8 @@ import java.io.IOException;
 import java.util.ServiceLoader;
 
 import javax.enterprise.inject.Instance;
+import javax.enterprise.inject.spi.BeanAttributes;
+import javax.enterprise.inject.spi.InjectionTargetFactory;
 
 import org.codehaus.plexus.interpolation.InterpolationException;
 import org.commonjava.propulsor.config.Configurator;

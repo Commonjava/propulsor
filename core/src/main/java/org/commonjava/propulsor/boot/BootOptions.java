@@ -41,10 +41,12 @@ public abstract class BootOptions {
 
     private String homeDir;
 
-    @Option(name = "-f", aliases = { "--config" }, usage = "Specify a different configuration file (defaults to ${ulah.home}/etc/main.conf or $ULAH_HOME/etc/main.conf)")
+    @Option(name = "-f", aliases = { "--config" }, usage = "Specify the configuration file")
     private String config;
 
     public abstract String getHomeSystemProperty();
+
+    public abstract String getConfigSystemProperty();
 
     public abstract String getHomeEnvar();
 
@@ -86,7 +88,8 @@ public abstract class BootOptions {
         final Properties properties = System.getProperties();
 
         properties.setProperty(getHomeSystemProperty(), homeDir);
-        setApplicationSystemProperties(properties);
+        properties.setProperty( getConfigSystemProperty(), config );
+        setApplicationSystemProperties( properties );
         System.setProperties(properties);
     }
 
@@ -165,7 +168,7 @@ public abstract class BootOptions {
     }
 
     public String getHomeDir() {
-        return homeDir;
+        return homeDir == null ? System.getProperty("user.home") + "/." + getHomeSystemProperty() : homeDir;
     }
 
     public void setHomeDir(final String home) {
@@ -173,7 +176,7 @@ public abstract class BootOptions {
     }
 
     public String getConfig() {
-        return config == null ? new File(getHomeDir(), "etc/main.conf")
+        return config == null ? new File(getHomeDir(), "." + getHomeSystemProperty() + "/etc/main.conf")
                 .getPath() : config;
     }
 

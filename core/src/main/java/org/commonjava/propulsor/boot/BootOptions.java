@@ -111,8 +111,6 @@ public abstract class BootOptions {
             }
         }
 
-        bootProps.setProperty("aprox.home", homeDir);
-
         if (interp == null) {
             interp = new StringSearchInterpolator();
             interp.addValueSource(new PropertiesBasedValueSource(bootProps));

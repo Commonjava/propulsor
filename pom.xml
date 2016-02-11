@@ -36,7 +36,6 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <resteasyVersion>3.0.12.Final</resteasyVersion>
     <undertowVersion>1.1.2.Final</undertowVersion>
     <jacksonVersion>2.4.1</jacksonVersion>
     <javaVersion>1.8</javaVersion>
@@ -49,7 +48,7 @@
       <dependency>
         <groupId>org.commonjava.boms</groupId>
         <artifactId>web-commons-bom</artifactId>
-        <version>17</version>
+        <version>18-SNAPSHOT</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -81,31 +80,7 @@
           <artifactId>undertow-servlet</artifactId>
           <version>${undertowVersion}</version>
       </dependency>
-      <dependency>
-          <groupId>org.jboss.resteasy</groupId>
-          <artifactId>resteasy-jaxrs</artifactId>
-          <version>${resteasyVersion}</version>
-      </dependency>
-      <dependency>
-          <groupId>org.jboss.resteasy</groupId>
-          <artifactId>resteasy-cdi</artifactId>
-          <version>${resteasyVersion}</version>
-      </dependency>
-      <dependency>
-          <groupId>org.jboss.resteasy</groupId>
-          <artifactId>jaxrs-api</artifactId>
-          <version>${resteasyVersion}</version>
-      </dependency>
-      <dependency>
-          <groupId>org.jboss.resteasy</groupId>
-          <artifactId>async-http-servlet-3.0</artifactId>
-          <version>${resteasyVersion}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.jboss.spec.javax.servlet</groupId>
-        <artifactId>jboss-servlet-api_3.0_spec</artifactId>
-        <version>1.0.1.Final</version>
-      </dependency>
+      <!-- versions of resteasy and servlet api dependencies are defined in web-commons-bom -->
       <dependency>
         <groupId>com.fasterxml.jackson.core</groupId>
         <artifactId>jackson-databind</artifactId>
@@ -123,16 +98,6 @@
       </dependency>
       <!-- END: JAX-RS support -->
       
-      <dependency>
-        <groupId>org.jboss.weld.se</groupId>
-        <artifactId>weld-se</artifactId>
-        <version>2.3.0.Final</version>
-      </dependency>
-      <dependency>
-        <groupId>org.jboss.weld.se</groupId>
-        <artifactId>weld-se-core</artifactId>
-        <version>2.3.0.Final</version>
-      </dependency>
       <dependency>
         <groupId>javax.enterprise</groupId>
         <artifactId>cdi-api</artifactId>

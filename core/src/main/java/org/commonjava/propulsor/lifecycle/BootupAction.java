@@ -16,7 +16,7 @@
 package org.commonjava.propulsor.lifecycle;
 
 /**
- * Performs some sort of service/subsystem bootup just before AProx is preparing
+ * Performs some sort of service/subsystem bootup just before application is preparing
  * to run.
  */
 public interface BootupAction extends AppLifecycleAction {

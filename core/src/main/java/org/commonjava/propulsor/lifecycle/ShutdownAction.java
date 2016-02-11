@@ -16,7 +16,7 @@
 package org.commonjava.propulsor.lifecycle;
 
 /**
- * Performs some sort of service/subsystem shutdown as AProx is stopping.
+ * Performs some sort of service/subsystem shutdown as application is stopping.
  */
 public interface ShutdownAction extends AppLifecycleAction {
 

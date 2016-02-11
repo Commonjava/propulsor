@@ -15,14 +15,11 @@
  */
 package org.commonjava.propulsor.deploy.resteasy.jackson;
 
-import javax.inject.Inject;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-
 import org.commonjava.propulsor.deploy.resteasy.RestProvider;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.Produces;
+
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
 @Consumes( { "application/json", "application/*+json", "text/json" } )
@@ -31,7 +28,7 @@ public class CDIJacksonProvider
     extends JacksonJsonProvider
     implements RestProvider
 {
-
+/*
     @Inject
     private ObjectMapper mapper;
 
@@ -44,4 +41,5 @@ public class CDIJacksonProvider
 
         return mapper;
     }
+*/
 }

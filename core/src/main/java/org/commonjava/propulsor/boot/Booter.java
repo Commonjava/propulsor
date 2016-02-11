@@ -23,10 +23,7 @@ import static org.commonjava.propulsor.boot.BootStatus.ERR_STARTING;
 import java.io.File;
 import java.io.IOException;
 import java.util.ServiceLoader;
-
 import javax.enterprise.inject.Instance;
-import javax.enterprise.inject.spi.BeanAttributes;
-import javax.enterprise.inject.spi.InjectionTargetFactory;
 
 import org.codehaus.plexus.interpolation.InterpolationException;
 import org.commonjava.propulsor.config.Configurator;
@@ -241,6 +238,9 @@ public class Booter
         }
         catch ( final ConfiguratorException e )
         {
+            if (status == null) {
+                status = new BootStatus();
+            }
             status.markFailed( ERR_LOAD_CONFIG, e );
         }
     }

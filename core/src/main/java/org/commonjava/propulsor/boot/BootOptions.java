@@ -117,7 +117,7 @@ public abstract class BootOptions {
             }
         }
 
-        bootProps.setProperty("aprox.home", homeDir);
+        bootProps.setProperty(getHomeSystemProperty(), homeDir);
 
         if (interp == null) {
             interp = new StringSearchInterpolator();

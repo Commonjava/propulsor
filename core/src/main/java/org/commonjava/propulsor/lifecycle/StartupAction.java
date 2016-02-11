@@ -16,13 +16,13 @@
 package org.commonjava.propulsor.lifecycle;
 
 /**
- * Performs some sort of service/subsystem startup as AProx is preparing to run.
+ * Performs some sort of service/subsystem startup as application is preparing to run.
  */
 public interface StartupAction extends AppLifecycleAction {
 
     /**
      * Start some service after migration actions are completed, just before
-     * AProx is ready for use.
+     * application is ready for use.
      */
     void start() throws AppLifecycleException;
 

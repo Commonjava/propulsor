@@ -20,13 +20,10 @@ import static org.commonjava.propulsor.boot.BootStatus.ERR_LOAD_FROM_SYSPROPS;
 import static org.commonjava.propulsor.boot.BootStatus.ERR_PARSE_ARGS;
 import static org.commonjava.propulsor.boot.BootStatus.ERR_STARTING;
 
+import javax.enterprise.inject.Instance;
 import java.io.File;
 import java.io.IOException;
 import java.util.ServiceLoader;
-
-import javax.enterprise.inject.Instance;
-import javax.enterprise.inject.spi.BeanAttributes;
-import javax.enterprise.inject.spi.InjectionTargetFactory;
 
 import org.codehaus.plexus.interpolation.InterpolationException;
 import org.commonjava.propulsor.config.Configurator;
@@ -35,6 +32,7 @@ import org.commonjava.propulsor.deploy.Deployer;
 import org.commonjava.propulsor.lifecycle.AppLifecycleManager;
 import org.jboss.weld.environment.se.Weld;
 import org.jboss.weld.environment.se.WeldContainer;
+import org.jboss.weld.exceptions.IllegalStateException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -145,7 +143,6 @@ public class Booter
 
     private Configurator configurator;
 
-    private BootStatus status;
 
     private AppLifecycleManager lifecycleManager;
 
@@ -170,7 +167,10 @@ public class Booter
     public BootStatus runAndWait( final BootOptions bootOptions )
         throws BootException
     {
-        start( bootOptions );
+        BootStatus status = start( bootOptions );
+        if (!status.isSuccess()) {
+            return  status;
+        }
 
         logger.info( "Setting up shutdown hook..." );
         lifecycleManager.installShutdownHook();
@@ -201,14 +201,14 @@ public class Booter
         return options;
     }
 
-    public boolean deploy()
+    public BootStatus deploy()
     {
         deployer = container.instance()
                             .select( Deployer.class )
                             .get();
-        status = deployer.deploy( options );
+        BootStatus status = deployer.deploy( options );
 
-        return status == null ? false : status.isSuccess();
+        return status == null ? new BootStatus(ERR_STARTING, new IllegalStateException("Deployment failed")) : status;
     }
 
     public BootStatus start( final BootOptions bootOptions )
@@ -217,31 +217,33 @@ public class Booter
         initialize( bootOptions );
         logger.info( "Booter running: " + this );
 
-        configure();
+        BootStatus status = configure();
+        if (status != null)
+            return status;
         startLifecycle();
 
-        deploy();
-        return status;
+        return deploy();
     }
 
-    public void configure()
+    public BootStatus configure()
     {
         final Instance<Configurator> selection = container.instance()
                                                           .select( Configurator.class );
         if ( !selection.iterator()
                        .hasNext() )
         {
-            return;
+            return null;
         }
 
         configurator = selection.get();
         try
         {
             configurator.load( options );
+            return  null;
         }
         catch ( final ConfiguratorException e )
         {
-            status.markFailed( ERR_LOAD_CONFIG, e );
+            return new BootStatus(ERR_LOAD_CONFIG, e);
         }
     }
 

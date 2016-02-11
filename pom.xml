@@ -36,10 +36,12 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <resteasyVersion>3.0.9.Final</resteasyVersion>
+    <resteasyVersion>3.0.12.Final</resteasyVersion>
     <undertowVersion>1.1.2.Final</undertowVersion>
     <jacksonVersion>2.4.1</jacksonVersion>
     <javaVersion>1.8</javaVersion>
+    <maven.compiler.source>${javaVersion}</maven.compiler.source>
+    <maven.compiler.target>${javaVersion}</maven.compiler.target>
   </properties>
 
   <dependencyManagement>
@@ -169,13 +171,6 @@
   <build>
     <pluginManagement>
       <plugins>
-        <plugin>
-          <artifactId>maven-compiler-plugin</artifactId>
-          <configuration>
-            <source>${javaVersion}</source>
-            <target>${javaVersion}</target>
-          </configuration>
-        </plugin>
         <plugin>
           <artifactId>maven-shade-plugin</artifactId>
           <version>2.3</version>

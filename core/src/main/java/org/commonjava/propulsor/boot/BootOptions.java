@@ -87,10 +87,16 @@ public abstract class BootOptions {
     protected final void setSystemProperties() {
         final Properties properties = System.getProperties();
 
-        properties.setProperty(getHomeSystemProperty(), homeDir);
-        properties.setProperty( getConfigSystemProperty(), config );
+        properties.setProperty(getHomeSystemProperty(),  assertPropertyIsNotNull(getHomeDir(), "homeDir is not specified"));
+        properties.setProperty( getConfigSystemProperty(), assertPropertyIsNotNull(getConfig(), "config is not specified"));
         setApplicationSystemProperties( properties );
         System.setProperties(properties);
+    }
+
+    private final String assertPropertyIsNotNull(String value, String errorMessage) {
+        if (value == null)
+            throw new IllegalStateException(errorMessage);
+        return value;
     }
 
     protected final Properties getBootProperties() {
@@ -110,6 +116,8 @@ public abstract class BootOptions {
                 bootProps = new Properties();
             }
         }
+
+        bootProps.setProperty(getHomeSystemProperty(), homeDir);
 
         if (interp == null) {
             interp = new StringSearchInterpolator();

@@ -44,6 +44,8 @@ public abstract class BootOptions {
     @Option(name = "-f", aliases = { "--config" }, usage = "Specify the configuration file")
     private String config;
 
+    public abstract String getApplicationName();
+
     public abstract String getHomeSystemProperty();
 
     public abstract String getConfigSystemProperty();
@@ -179,6 +181,11 @@ public abstract class BootOptions {
 
     public void setHomeDir(final String home) {
         homeDir = home;
+    }
+
+    protected String getSpecifiedConfig()
+    {
+        return config;
     }
 
     public String getConfig() {

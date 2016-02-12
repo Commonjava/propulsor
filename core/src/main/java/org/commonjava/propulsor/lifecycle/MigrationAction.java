@@ -16,8 +16,8 @@
 package org.commonjava.propulsor.lifecycle;
 
 /**
- * Converts storage/data formats from older versions of AProx into up-to-date
- * forms. These are run right after the system boots, but before AProx enters
+ * Converts storage/data formats from older versions of application into up-to-date
+ * forms. These are run right after the system boots, but before application enters
  * its startup sequence (see {@link StartupAction}).
  */
 public interface MigrationAction extends AppLifecycleAction {

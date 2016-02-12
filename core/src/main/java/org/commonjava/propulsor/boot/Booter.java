@@ -184,7 +184,7 @@ public class Booter
             catch ( final InterruptedException e )
             {
                 e.printStackTrace();
-                logger.info( "AProx exiting" );
+                logger.info( "{} exiting", options.getApplicationName() );
             }
         }
 

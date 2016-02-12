@@ -128,7 +128,7 @@ public class UndertowDeployer
             server.start();
             status.markSuccess();
 
-            System.out.printf( "AProx listening on %s:%s\n\n", bootOptions.getBind(), bootOptions.getPort() );
+            System.out.printf( "%s listening on %s:%s\n\n", options.getApplicationName(), bootOptions.getBind(), bootOptions.getPort() );
 
         }
         catch ( ServletException | RuntimeException e )

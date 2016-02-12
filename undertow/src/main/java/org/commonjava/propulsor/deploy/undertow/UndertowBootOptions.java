@@ -15,6 +15,8 @@
  */
 package org.commonjava.propulsor.deploy.undertow;
 
+import org.commonjava.propulsor.boot.BootOptions;
+
 public interface UndertowBootOptions
 {
 

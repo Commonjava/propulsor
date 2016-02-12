@@ -22,6 +22,8 @@ public interface UndertowBootOptions
 
     UndertowBootOptions DEFAULT = new UndertowBootOptions()
     {
+        private Integer port;
+
         @Override
         public String getContextPath()
         {
@@ -37,13 +39,19 @@ public interface UndertowBootOptions
         @Override
         public int getPort()
         {
-            return 8080;
+            return port == null ? 8080 : port;
         }
 
         @Override
         public String getBind()
         {
             return "0.0.0.0";
+        }
+
+        @Override
+        public void setPort( int port )
+        {
+            this.port = port;
         }
     };
 
@@ -55,4 +63,5 @@ public interface UndertowBootOptions
 
     String getBind();
 
+    void setPort( int port );
 }

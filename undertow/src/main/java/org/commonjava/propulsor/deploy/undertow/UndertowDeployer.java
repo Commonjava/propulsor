@@ -29,8 +29,10 @@ import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 import javax.servlet.ServletException;
 
+import org.commonjava.propulsor.boot.BootException;
 import org.commonjava.propulsor.boot.BootOptions;
 import org.commonjava.propulsor.boot.BootStatus;
+import org.commonjava.propulsor.boot.PortFinder;
 import org.commonjava.propulsor.deploy.Deployer;
 import org.commonjava.propulsor.deploy.undertow.util.DeploymentInfoUtils;
 
@@ -118,14 +120,55 @@ public class UndertowDeployer
         dm.deploy();
 
         status = new BootStatus();
+        ThreadLocal<Integer> usingPort = new ThreadLocal<>();
         try
         {
-            server = Undertow.builder()
-                             .setHandler( dm.start() )
-                             .addHttpListener( bootOptions.getPort(), bootOptions.getBind() )
-                             .build();
+            Integer port = bootOptions.getPort();
+            if ( port < 1 )
+            {
+                System.out.println("Looking for open port...");
 
-            server.start();
+                final ThreadLocal<ServletException> errorHolder = new ThreadLocal<>();
+                server = PortFinder.findPortFor( 16, ( foundPort ) -> {
+                    Undertow undertow = null;
+                    try
+                    {
+                        usingPort.set( foundPort );
+                        undertow = Undertow.builder()
+                                           .setHandler( dm.start() )
+                                           .addHttpListener( foundPort, bootOptions.getBind() )
+                                           .build();
+
+                        undertow.start();
+                    }
+                    catch ( ServletException e )
+                    {
+                        errorHolder.set( e );
+                    }
+
+                    return undertow;
+                } );
+
+                ServletException e = errorHolder.get();
+                if ( e != null )
+                {
+                    throw e;
+                }
+
+                bootOptions.setPort( usingPort.get() );
+            }
+            else
+            {
+                usingPort.set( port );
+                server = Undertow.builder()
+                                 .setHandler( dm.start() )
+                                 .addHttpListener( port, bootOptions.getBind() )
+                                 .build();
+
+
+                server.start();
+            }
+
             status.markSuccess();
 
             System.out.printf( "%s listening on %s:%s\n\n", options.getApplicationName(), bootOptions.getBind(), bootOptions.getPort() );
@@ -133,7 +176,7 @@ public class UndertowDeployer
         }
         catch ( ServletException | RuntimeException e )
         {
-            status.markFailed( BootStatus.ERR_CANT_LISTEN, e );
+            status.markFailed( BootStatus.ERR_CANT_LISTEN, new BootException( "Failed to start on port: " + usingPort.get(), e ) );
         }
 
         return status;

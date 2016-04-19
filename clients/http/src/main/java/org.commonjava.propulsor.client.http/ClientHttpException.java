@@ -20,7 +20,7 @@ import java.io.Serializable;
 import java.text.MessageFormat;
 
 /**
- * Signals an error communicating with the Indy server.
+ * Signals an error communicating with the server.
  * @author jdcasey
  */
 public class ClientHttpException

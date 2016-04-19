@@ -90,13 +90,13 @@ public class ClientHttpSupport
         this.httpFactory = new HttpFactory( authenticator );
     }
 
-    public ClientHttpSupport( final String baseUrl,
+    public ClientHttpSupport( final SiteConfig siteConfig,
                               final ObjectMapper mapper, final HttpFactory httpFactory )
             throws ClientHttpException
     {
-        this.baseUrl = baseUrl;
+        this.siteConfig = siteConfig;
+        this.baseUrl = siteConfig.getUri();
         this.objectMapper = mapper;
-        this.siteConfig = new SiteConfigBuilder("server", baseUrl).build();
         this.httpFactory = httpFactory;
     }
 
@@ -155,7 +155,7 @@ public class ClientHttpSupport
         }
         catch ( final IOException e )
         {
-            throw new ClientHttpException( "Indy request failed: %s", e, e.getMessage() );
+            throw new ClientHttpException( "Client request failed: %s", e, e.getMessage() );
         }
         finally
         {
@@ -200,7 +200,7 @@ public class ClientHttpSupport
         }
         catch ( final IOException e )
         {
-            throw new ClientHttpException( "Indy request failed: %s", e, e.getMessage() );
+            throw new ClientHttpException( "Client request failed: %s", e, e.getMessage() );
         }
         finally
         {
@@ -240,7 +240,7 @@ public class ClientHttpSupport
         }
         catch ( final IOException e )
         {
-            throw new ClientHttpException( "Indy request failed: %s", e, e.getMessage() );
+            throw new ClientHttpException( "Client request failed: %s", e, e.getMessage() );
         }
         finally
         {
@@ -263,7 +263,7 @@ public class ClientHttpSupport
         }
         catch ( final IOException e )
         {
-            throw new ClientHttpException( "Indy request failed: %s", e, e.getMessage() );
+            throw new ClientHttpException( "Client request failed: %s", e, e.getMessage() );
         }
         finally
         {
@@ -294,7 +294,7 @@ public class ClientHttpSupport
         }
         catch ( final IOException e )
         {
-            throw new ClientHttpException( "Indy request failed: %s", e, e.getMessage() );
+            throw new ClientHttpException( "Client request failed: %s", e, e.getMessage() );
         }
         finally
         {
@@ -339,11 +339,11 @@ public class ClientHttpSupport
                 throw (ClientHttpException) cause;
             }
 
-            throw new ClientHttpException( "Indy request failed: %s", e, e.getMessage() );
+            throw new ClientHttpException( "Client request failed: %s", e, e.getMessage() );
         }
         catch ( final IOException e )
         {
-            throw new ClientHttpException( "Indy request failed: %s", e, e.getMessage() );
+            throw new ClientHttpException( "Client request failed: %s", e, e.getMessage() );
         }
         finally
         {
@@ -384,7 +384,7 @@ public class ClientHttpSupport
         }
         catch ( final IOException e )
         {
-            throw new ClientHttpException( "Indy request failed: %s", e, e.getMessage() );
+            throw new ClientHttpException( "Client request failed: %s", e, e.getMessage() );
         }
         finally
         {
@@ -409,7 +409,7 @@ public class ClientHttpSupport
         }
         catch ( final IOException e )
         {
-            throw new ClientHttpException( "Indy request failed: %s", e, e.getMessage() );
+            throw new ClientHttpException( "Client request failed: %s", e, e.getMessage() );
         }
         finally
         {
@@ -451,7 +451,7 @@ public class ClientHttpSupport
         }
         catch ( final IOException e )
         {
-            throw new ClientHttpException( "Indy request failed: %s", e, e.getMessage() );
+            throw new ClientHttpException( "Client request failed: %s", e, e.getMessage() );
         }
         finally
         {
@@ -507,7 +507,7 @@ public class ClientHttpSupport
         }
         catch ( final IOException e )
         {
-            throw new ClientHttpException( "Indy request failed: %s", e, e.getMessage() );
+            throw new ClientHttpException( "Client request failed: %s", e, e.getMessage() );
         }
         finally
         {
@@ -565,7 +565,7 @@ public class ClientHttpSupport
         }
         catch ( final IOException e )
         {
-            throw new ClientHttpException( "Indy request failed: %s", e, e.getMessage() );
+            throw new ClientHttpException( "Client request failed: %s", e, e.getMessage() );
         }
         finally
         {
@@ -610,7 +610,7 @@ public class ClientHttpSupport
         }
         catch ( final IOException e )
         {
-            throw new ClientHttpException( "Indy request failed: %s", e, e.getMessage() );
+            throw new ClientHttpException( "Client request failed: %s", e, e.getMessage() );
         }
         finally
         {
@@ -665,7 +665,7 @@ public class ClientHttpSupport
         }
         catch ( final IOException e )
         {
-            throw new ClientHttpException( "Indy request failed: %s", e, e.getMessage() );
+            throw new ClientHttpException( "Client request failed: %s", e, e.getMessage() );
         }
         finally
         {
@@ -678,7 +678,7 @@ public class ClientHttpSupport
         cleanupResources( request, response, client );
     }
 
-    public String toIndyUrl( final String... path )
+    public String toServerUrl( final String... path )
     {
         return buildUrl( baseUrl, path );
     }
@@ -763,6 +763,11 @@ public class ClientHttpSupport
     public ObjectMapper getObjectMapper()
     {
         return objectMapper;
+    }
+
+    public HttpFactory getHttpFactory()
+    {
+        return httpFactory;
     }
 
 }

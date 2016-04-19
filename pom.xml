@@ -36,6 +36,7 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <jhttpcVersion>1.2-SNAPSHOT</jhttpcVersion>
     <resteasyVersion>3.0.12.Final</resteasyVersion>
     <undertowVersion>1.1.2.Final</undertowVersion>
     <jacksonVersion>2.4.1</jacksonVersion>
@@ -49,11 +50,16 @@
       <dependency>
         <groupId>org.commonjava.boms</groupId>
         <artifactId>web-commons-bom</artifactId>
-        <version>18-SNAPSHOT</version>
+        <version>21</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
       
+      <dependency>
+        <groupId>org.commonjava.propulsor.client</groupId>
+        <artifactId>propulsor-client-http</artifactId>
+        <version>0.1-SNAPSHOT</version>
+      </dependency>
       <dependency>
         <groupId>org.commonjava.propulsor</groupId>
         <artifactId>propulsor-core</artifactId>
@@ -99,6 +105,12 @@
       <!-- END: JAX-RS support -->
       
       <dependency>
+        <groupId>org.commonjava.util</groupId>
+        <artifactId>jhttpc</artifactId>
+        <version>${jhttpcVersion}</version>
+      </dependency>
+
+      <dependency>
         <groupId>javax.enterprise</groupId>
         <artifactId>cdi-api</artifactId>
         <version>1.2</version>
@@ -128,8 +140,12 @@
       <artifactId>logback-classic</artifactId>
     </dependency>
     <dependency>
-      <groupId>javax.enterprise</groupId>
-      <artifactId>cdi-api</artifactId>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
     </dependency>
   </dependencies>
   
@@ -148,5 +164,6 @@
     <module>core</module>
     <module>resteasy</module>
     <module>undertow</module>
+    <module>clients</module>
   </modules>
 </project>

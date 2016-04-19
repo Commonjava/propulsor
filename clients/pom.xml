@@ -25,41 +25,12 @@
     <version>0.1-SNAPSHOT</version>
   </parent>
   
-  <artifactId>propulsor-core</artifactId>
-  <name>Propulsor :: Core</name>
-  
-  <dependencies>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-ext</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>jcl-over-slf4j</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>jul-to-slf4j</artifactId>
-    </dependency>
+  <groupId>org.commonjava.propulsor.client</groupId>
+  <artifactId>propulsor-clients-parent</artifactId>
+  <name>Propulsor :: Clients :: Parent POM</name>
+  <packaging>pom</packaging>
 
-    <dependency>
-      <groupId>org.commonjava.util</groupId>
-      <artifactId>configuration-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.commonjava.util</groupId>
-      <artifactId>configuration-dotconf</artifactId>
-    </dependency>
-    
-    <dependency>
-      <groupId>org.jboss.weld.se</groupId>
-      <artifactId>weld-se-core</artifactId>
-      <scope>compile</scope>
-    </dependency>
-    
-    <dependency>
-    	<groupId>args4j</groupId>
-    	<artifactId>args4j</artifactId>
-    </dependency>
-  </dependencies>
+  <modules>
+    <module>http</module>
+  </modules>
 </project>

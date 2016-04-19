@@ -20,19 +20,28 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.commonjava.propulsor</groupId>
-    <artifactId>propulsor-parent</artifactId>
+    <groupId>org.commonjava.propulsor.client</groupId>
+    <artifactId>propulsor-clients-parent</artifactId>
     <version>0.1-SNAPSHOT</version>
   </parent>
   
-  <artifactId>propulsor-core</artifactId>
-  <name>Propulsor :: Core</name>
+  <artifactId>propulsor-client-http</artifactId>
+  <name>Propulsor :: Clients :: HTTP Client</name>
   
   <dependencies>
     <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-ext</artifactId>
+      <groupId>org.commonjava.util</groupId>
+      <artifactId>jhttpc</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpclient</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpcore</artifactId>
+    </dependency>
+
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>jcl-over-slf4j</artifactId>
@@ -41,25 +50,14 @@
       <groupId>org.slf4j</groupId>
       <artifactId>jul-to-slf4j</artifactId>
     </dependency>
-
-    <dependency>
-      <groupId>org.commonjava.util</groupId>
-      <artifactId>configuration-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.commonjava.util</groupId>
-      <artifactId>configuration-dotconf</artifactId>
-    </dependency>
     
     <dependency>
-      <groupId>org.jboss.weld.se</groupId>
-      <artifactId>weld-se-core</artifactId>
-      <scope>compile</scope>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
     </dependency>
-    
     <dependency>
-    	<groupId>args4j</groupId>
-    	<artifactId>args4j</artifactId>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-core</artifactId>
     </dependency>
   </dependencies>
 </project>

@@ -15,11 +15,6 @@
  */
 package org.commonjava.propulsor.boot;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.Properties;
-
 import org.apache.commons.io.IOUtils;
 import org.codehaus.plexus.interpolation.InterpolationException;
 import org.codehaus.plexus.interpolation.PropertiesBasedValueSource;
@@ -28,11 +23,19 @@ import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
 
-public abstract class BootOptions {
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.Properties;
+
+import static org.apache.commons.lang.StringUtils.isEmpty;
+
+public abstract class BootOptions
+{
 
     public static final String BOOT_DEFAULTS_PROP = "boot.properties";
 
-    @Option(name = "-h", aliases = { "--help" }, usage = "Print this and exit")
+    @Option( name = "-h", aliases = { "--help" }, usage = "Print this and exit" )
     private boolean help;
 
     private StringSearchInterpolator interp;
@@ -41,7 +44,7 @@ public abstract class BootOptions {
 
     private String homeDir;
 
-    @Option(name = "-f", aliases = { "--config" }, usage = "Specify the configuration file")
+    @Option( name = "-f", aliases = { "--config" }, usage = "Specify the configuration file" )
     private String config;
 
     public abstract String getApplicationName();
@@ -61,125 +64,156 @@ public abstract class BootOptions {
         this.homeDir = homeDir;
     }
 
-    protected void loadApplicationOptions() {
+    protected void loadApplicationOptions()
+    {
     }
 
-    protected void setApplicationSystemProperties(final Properties properties) {
+    protected void setApplicationSystemProperties( final Properties properties )
+    {
     }
 
-    public void load(final File bootDefaults, final String home)
-            throws IOException, InterpolationException {
+    public void load( final File bootDefaults, final String home )
+            throws IOException, InterpolationException
+    {
         homeDir = home;
         bootProps = new Properties();
 
-        if (bootDefaults != null && bootDefaults.exists()) {
+        if ( bootDefaults != null && bootDefaults.exists() )
+        {
             FileInputStream stream = null;
-            try {
-                stream = new FileInputStream(bootDefaults);
+            try
+            {
+                stream = new FileInputStream( bootDefaults );
 
-                bootProps.load(stream);
-            } finally {
-                IOUtils.closeQuietly(stream);
+                bootProps.load( stream );
+            }
+            finally
+            {
+                IOUtils.closeQuietly( stream );
             }
         }
 
         loadApplicationOptions();
     }
 
-    protected final void setSystemProperties() {
+    protected final void setSystemProperties()
+    {
         final Properties properties = System.getProperties();
 
-        properties.setProperty(getHomeSystemProperty(),  assertPropertyIsNotNull(getHomeDir(), "homeDir is not specified"));
-        properties.setProperty( getConfigSystemProperty(), assertPropertyIsNotNull(getConfig(), "config is not specified"));
+        setProperty( properties, getHomeSystemProperty(), getHomeDir() );
+        setProperty( properties, getConfigSystemProperty(), getConfig() );
         setApplicationSystemProperties( properties );
-        System.setProperties(properties);
+
+        System.setProperties( properties );
     }
 
-    private final String assertPropertyIsNotNull(String value, String errorMessage) {
-        if (value == null)
-            throw new IllegalStateException(errorMessage);
-        return value;
+    private final void setProperty( Properties properties, String key, String value )
+    {
+        if ( isEmpty( value ) )
+        {
+            throw new IllegalStateException( key + " is not specified." );
+        }
+
+        properties.setProperty( key, value );
     }
 
-    protected final Properties getBootProperties() {
+    protected final Properties getBootProperties()
+    {
         return bootProps;
     }
 
-    protected final String resolve(final String value)
-            throws InterpolationException {
-        if (value == null || value.trim().length() < 1) {
+    protected final String resolve( final String value )
+            throws InterpolationException
+    {
+        if ( value == null || value.trim().length() < 1 )
+        {
             return null;
         }
 
-        if (bootProps == null) {
-            if (homeDir == null) {
+        if ( bootProps == null )
+        {
+            if ( homeDir == null )
+            {
                 return value;
-            } else {
+            }
+            else
+            {
                 bootProps = new Properties();
             }
         }
 
-        bootProps.setProperty(getHomeSystemProperty(), homeDir);
+        bootProps.setProperty( getHomeSystemProperty(), homeDir );
 
-        if (interp == null) {
+        if ( interp == null )
+        {
             interp = new StringSearchInterpolator();
-            interp.addValueSource(new PropertiesBasedValueSource(bootProps));
+            interp.addValueSource( new PropertiesBasedValueSource( bootProps ) );
         }
 
-        return interp.interpolate(value);
+        return interp.interpolate( value );
     }
 
-    public boolean isHelp() {
+    public boolean isHelp()
+    {
         return help;
     }
 
-    public BootOptions setHelp(final boolean help) {
+    public BootOptions setHelp( final boolean help )
+    {
         this.help = help;
         return this;
     }
 
-    public boolean parseArgs(final String[] args) throws BootException {
-        final CmdLineParser parser = new CmdLineParser(this);
+    public boolean parseArgs( final String[] args )
+            throws BootException
+    {
+        final CmdLineParser parser = new CmdLineParser( this );
         boolean canStart = true;
-        try {
-            parser.parseArgument(args);
-        } catch (final CmdLineException e) {
-            throw new BootException("Failed to parse command-line args: %s", e,
-                    e.getMessage());
+        try
+        {
+            parser.parseArgument( args );
+        }
+        catch ( final CmdLineException e )
+        {
+            throw new BootException( "Failed to parse command-line args: %s", e, e.getMessage() );
         }
 
-        if (isHelp()) {
-            printUsage(parser, null);
+        if ( isHelp() )
+        {
+            printUsage( parser, null );
             canStart = false;
         }
 
         return canStart;
     }
 
-    public static void printUsage(final CmdLineParser parser,
-            final CmdLineException error) {
-        if (error != null) {
-            System.err.println("Invalid option(s): " + error.getMessage());
+    public static void printUsage( final CmdLineParser parser, final CmdLineException error )
+    {
+        if ( error != null )
+        {
+            System.err.println( "Invalid option(s): " + error.getMessage() );
             System.err.println();
         }
 
-        System.err.println("Usage: $0 [OPTIONS] [<target-path>]");
+        System.err.println( "Usage: $0 [OPTIONS] [<target-path>]" );
         System.err.println();
         System.err.println();
         // If we are running under a Linux shell COLUMNS might be available for
         // the width
         // of the terminal.
-        parser.setUsageWidth(System.getenv("COLUMNS") == null ? 100 : Integer
-                .valueOf(System.getenv("COLUMNS")));
-        parser.printUsage(System.err);
+        parser.setUsageWidth(
+                System.getenv( "COLUMNS" ) == null ? 100 : Integer.valueOf( System.getenv( "COLUMNS" ) ) );
+        parser.printUsage( System.err );
         System.err.println();
     }
 
-    public String getHomeDir() {
-        return homeDir == null ? System.getProperty("user.home") + "/." + getHomeSystemProperty() : homeDir;
+    public String getHomeDir()
+    {
+        return homeDir == null ? System.getProperty( "user.home" ) + "/." + getHomeSystemProperty() : homeDir;
     }
 
-    public void setHomeDir(final String home) {
+    public void setHomeDir( final String home )
+    {
         homeDir = home;
     }
 
@@ -188,9 +222,23 @@ public abstract class BootOptions {
         return config;
     }
 
-    public String getConfig() {
-        return config == null ? new File(getHomeDir(), "." + getHomeSystemProperty() + "/etc/main.conf")
-                .getPath() : config;
+    public String getConfig()
+    {
+        return config == null ? getDefaultConfigFile() : config;
     }
 
+    protected String getDefaultConfigFile()
+    {
+        return new File( getHomeDir(), "etc/main.conf" ).getPath();
+    }
+
+    public void setConfig( String config )
+    {
+        this.config = config;
+    }
+
+    public void setBootProps( Properties bootProps )
+    {
+        this.bootProps = bootProps;
+    }
 }

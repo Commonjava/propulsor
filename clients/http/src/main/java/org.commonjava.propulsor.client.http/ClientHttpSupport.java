@@ -31,6 +31,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.entity.ContentType;
 import org.apache.http.entity.InputStreamEntity;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -51,6 +52,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
 
+import static org.apache.http.entity.ContentType.APPLICATION_JSON;
 import static org.commonjava.propulsor.client.http.helper.HttpResources.cleanupResources;
 import static org.commonjava.propulsor.client.http.helper.HttpResources.entityToString;
 import static org.commonjava.propulsor.client.http.helper.UrlUtils.buildUrl;
@@ -372,7 +374,7 @@ public class ClientHttpSupport
             client = newClient();
             put = newJsonPut( buildUrl( baseUrl, path ) );
 
-            put.setEntity( new StringEntity( objectMapper.writeValueAsString( value ) ) );
+            put.setEntity( new StringEntity( objectMapper.writeValueAsString( value ), APPLICATION_JSON ) );
 
             response = client.execute( put );
             final StatusLine sl = response.getStatusLine();
@@ -442,7 +444,7 @@ public class ClientHttpSupport
                 }
             }
 
-            req.setEntity( new StringEntity( objectMapper.writeValueAsString( value ) ) );
+            req.setEntity( new StringEntity( objectMapper.writeValueAsString( value ), APPLICATION_JSON ) );
 
             final CloseableHttpClient client = newClient();
 
@@ -491,7 +493,7 @@ public class ClientHttpSupport
             client = newClient();
             post = newJsonPost( buildUrl( baseUrl, path ) );
 
-            post.setEntity( new StringEntity( objectMapper.writeValueAsString( value ) ) );
+            post.setEntity( new StringEntity( objectMapper.writeValueAsString( value ), APPLICATION_JSON ) );
 
             response = client.execute( post );
 
@@ -549,7 +551,7 @@ public class ClientHttpSupport
             client = newClient();
             post = newJsonPost( buildUrl( baseUrl, path ) );
 
-            post.setEntity( new StringEntity( objectMapper.writeValueAsString( value ) ) );
+            post.setEntity( new StringEntity( objectMapper.writeValueAsString( value ), APPLICATION_JSON ) );
 
             response = client.execute( post );
 

@@ -28,6 +28,7 @@ import java.net.URL;
 
 import javax.activation.FileTypeMap;
 import javax.activation.MimetypesFileTypeMap;
+import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.spi.CDI;
 import javax.inject.Inject;
 import javax.servlet.ServletException;
@@ -41,6 +42,7 @@ import org.commonjava.propulsor.deploy.undertow.util.ApplicationStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@ApplicationScoped
 public class UIServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
@@ -59,6 +61,13 @@ public class UIServlet extends HttpServlet {
             IOException {
         if (config == null) {
             config = CDI.current().select(UIConfiguration.class).get();
+        }
+
+        if ( !config.isEnabled() )
+        {
+            logger.debug("UI is disabled; sending 404");
+            response.setStatus(ApplicationStatus.NOT_FOUND.code());
+            return;
         }
 
         String path;

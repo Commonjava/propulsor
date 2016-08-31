@@ -15,6 +15,7 @@
  */
 package org.commonjava.propulsor.deploy.resteasy;
 
+import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import io.undertow.servlet.Servlets;
 import io.undertow.servlet.api.DeploymentInfo;
 import io.undertow.servlet.api.ServletInfo;
@@ -23,12 +24,16 @@ import java.util.HashSet;
 import java.util.Set;
 
 import javax.annotation.PostConstruct;
+import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Instance;
+import javax.enterprise.inject.spi.BeanManager;
 import javax.inject.Inject;
 import javax.ws.rs.core.Application;
 
+import org.apache.commons.lang.StringUtils;
 import org.commonjava.propulsor.deploy.resteasy.helper.CdiInjectorFactoryImpl;
 import org.commonjava.propulsor.deploy.resteasy.helper.RequestScopeListener;
+import org.commonjava.propulsor.deploy.resteasy.jackson.CDIJacksonProvider;
 import org.commonjava.propulsor.deploy.undertow.UndertowDeploymentProvider;
 import org.jboss.resteasy.plugins.server.servlet.HttpServlet30Dispatcher;
 import org.jboss.resteasy.spi.ResteasyDeployment;
@@ -36,6 +41,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 // TODO: Is it really right to make this extend Application?? Not sure...
+@ApplicationScoped
 public class ResteasyDeploymentProvider
     extends Application
     implements UndertowDeploymentProvider
@@ -51,6 +57,13 @@ public class ResteasyDeploymentProvider
 
     @Inject
     private ResteasyAppConfig config;
+
+    @Inject
+    private BeanManager bmgr;
+
+    // just make sure it loads, dammit
+//    @Inject
+//    private CDIJacksonProvider jacksonProvider;
 
     private Set<Class<?>> resourceClasses;
 
@@ -95,6 +108,9 @@ public class ResteasyDeploymentProvider
         //        deployment.getActualProviderClasses()
         //                  .addAll( providerClasses );
 
+        LoggerFactory.getLogger( getClass() )
+                     .debug( "\n\n\n\nRESTEasy DeploymentManager Using BeanManager: {} (@{})\n  with ObjectMapper: {}\n\n\n", bmgr, bmgr.hashCode() );
+
         deployment.setApplication( this );
         deployment.setInjectorFactoryClass( CdiInjectorFactoryImpl.class.getName() );
 
@@ -117,7 +133,10 @@ public class ResteasyDeploymentProvider
 
         // TODO: This might not be right...
         allClasses.addAll( providerClasses );
+        allClasses.add( CDIJacksonProvider.class );
+//        allClasses.add( JacksonJsonProvider.class );
 
+        logger.debug( "Returning getClass() with: \n  {}", StringUtils.join( allClasses, "\n  " ) );
         return allClasses;
     }
 

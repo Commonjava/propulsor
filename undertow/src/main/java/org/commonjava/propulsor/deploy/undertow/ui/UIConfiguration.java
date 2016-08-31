@@ -17,17 +17,22 @@ package org.commonjava.propulsor.deploy.undertow.ui;
 
 import java.io.File;
 
+import org.commonjava.web.config.annotation.ConfigName;
 import org.commonjava.web.config.annotation.ConfigNames;
 import org.commonjava.web.config.annotation.SectionName;
 
 @SectionName("ui")
 public class UIConfiguration {
+
+    public static final boolean DEFAULT_ENABLED = true;
+
+    private Boolean enabled;
+
     private File uiDir;
 
     public UIConfiguration() {
     }
 
-    @ConfigNames("ui.dir")
     public UIConfiguration(final File uiDir) {
         this.uiDir = uiDir;
     }
@@ -36,8 +41,19 @@ public class UIConfiguration {
         return uiDir;
     }
 
+    @ConfigName( "ui.dir")
     public void setUIDir(final File uiDir) {
         this.uiDir = uiDir;
     }
 
+    public boolean isEnabled()
+    {
+        return enabled == null ? DEFAULT_ENABLED : enabled;
+    }
+
+    @ConfigName( "enabled" )
+    public void setEnabled( boolean enabled )
+    {
+        this.enabled = enabled;
+    }
 }

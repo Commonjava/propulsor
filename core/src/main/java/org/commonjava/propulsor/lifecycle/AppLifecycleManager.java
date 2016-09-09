@@ -16,7 +16,10 @@
 package org.commonjava.propulsor.lifecycle;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
@@ -26,6 +29,24 @@ import javax.inject.Inject;
 @ApplicationScoped
 public class AppLifecycleManager {
 
+    private static final Comparator<AppLifecycleAction> PRIORITY_COMPARATOR =
+            ( one, two ) -> new Integer( one.getPriority() ).compareTo( two.getPriority() );
+
+    @Inject
+    private Instance<BootupAction> bootupActionInstances;
+
+    private List<BootupAction> bootupActions;
+
+    @Inject
+    private Instance<MigrationAction> migrationActionInstances;
+
+    private List<MigrationAction> migrationActions;
+
+    @Inject
+    private Instance<StartupAction> startupActionInstances;
+
+    private List<StartupAction> startupActions;
+
     @Inject
     private Instance<ShutdownAction> shutdownActionInstances;
 
@@ -34,11 +55,57 @@ public class AppLifecycleManager {
     protected AppLifecycleManager() {
     }
 
-    public AppLifecycleManager(final List<ShutdownAction> shutdownActions) {
+    public AppLifecycleManager(final List<BootupAction> bootupActions, final List<MigrationAction> migrationActions, final List<StartupAction> startupActions, final List<ShutdownAction> shutdownActions) {
+        this.bootupActions = bootupActions;
+        this.migrationActions = migrationActions;
+        this.startupActions = startupActions;
         this.shutdownActions = shutdownActions;
     }
 
+    public void startup()
+            throws AppLifecycleException
+    {
+        boot();
+        migrate();
+        start();
+    }
+
+    private void start()
+            throws AppLifecycleException
+    {
+        Collections.sort( startupActions, PRIORITY_COMPARATOR );
+
+        for ( final StartupAction action : startupActions )
+        {
+            action.start();
+        }
+    }
+
+    private void migrate()
+            throws AppLifecycleException
+    {
+        Collections.sort( startupActions, PRIORITY_COMPARATOR );
+
+        for ( final MigrationAction action : migrationActions )
+        {
+            action.migrate();
+        }
+    }
+
+    private void boot()
+            throws AppLifecycleException
+    {
+        Collections.sort( startupActions, PRIORITY_COMPARATOR );
+
+        for ( final BootupAction action : bootupActions )
+        {
+            action.init();
+        }
+    }
+
     public void stop() {
+        Collections.sort( startupActions, PRIORITY_COMPARATOR );
+
         for (final ShutdownAction shutdownAction : shutdownActions) {
             shutdownAction.shutdown();
         }
@@ -46,6 +113,21 @@ public class AppLifecycleManager {
 
     @PostConstruct
     public void initCDI() {
+        bootupActions = new ArrayList<>();
+        for (final BootupAction action : bootupActionInstances) {
+            bootupActions.add(action);
+        }
+
+        migrationActions = new ArrayList<>();
+        for (final MigrationAction action : migrationActionInstances) {
+            migrationActions.add( action );
+        }
+
+        startupActions = new ArrayList<>();
+        for (final StartupAction action : startupActionInstances) {
+            startupActions.add( action );
+        }
+
         shutdownActions = new ArrayList<>();
         for (final ShutdownAction shutdownAction : shutdownActionInstances) {
             shutdownActions.add(shutdownAction);
@@ -54,16 +136,6 @@ public class AppLifecycleManager {
 
     public void installShutdownHook() {
         Runtime.getRuntime()
-               .addShutdownHook( new Thread( new ShutdownRunnable() ) );
-    }
-
-    private final class ShutdownRunnable
-        implements Runnable
-    {
-        @Override
-        public void run()
-        {
-            stop();
-        }
+               .addShutdownHook( new Thread( ()->stop() ) );
     }
 }

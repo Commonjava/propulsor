@@ -15,26 +15,27 @@
  */
 package org.commonjava.propulsor.boot;
 
-import static org.commonjava.propulsor.boot.BootStatus.ERR_LOAD_CONFIG;
-import static org.commonjava.propulsor.boot.BootStatus.ERR_LOAD_FROM_SYSPROPS;
-import static org.commonjava.propulsor.boot.BootStatus.ERR_PARSE_ARGS;
-import static org.commonjava.propulsor.boot.BootStatus.ERR_STARTING;
-
-import javax.enterprise.inject.Instance;
-import java.io.File;
-import java.io.IOException;
-import java.util.ServiceLoader;
-
 import org.codehaus.plexus.interpolation.InterpolationException;
 import org.commonjava.propulsor.config.Configurator;
 import org.commonjava.propulsor.config.ConfiguratorException;
 import org.commonjava.propulsor.deploy.Deployer;
+import org.commonjava.propulsor.lifecycle.AppLifecycleException;
 import org.commonjava.propulsor.lifecycle.AppLifecycleManager;
 import org.jboss.weld.environment.se.Weld;
 import org.jboss.weld.environment.se.WeldContainer;
 import org.jboss.weld.exceptions.IllegalStateException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.enterprise.inject.Instance;
+import java.io.File;
+import java.io.IOException;
+import java.util.ServiceLoader;
+
+import static org.commonjava.propulsor.boot.BootStatus.ERR_LOAD_CONFIG;
+import static org.commonjava.propulsor.boot.BootStatus.ERR_LOAD_FROM_SYSPROPS;
+import static org.commonjava.propulsor.boot.BootStatus.ERR_PARSE_ARGS;
+import static org.commonjava.propulsor.boot.BootStatus.ERR_STARTING;
 
 public class Booter
 {
@@ -80,16 +81,14 @@ public class Booter
 
         if ( status.isFailed() )
         {
-            status.getError()
-                  .printStackTrace();
-            System.err.println( status.getError()
-                                      .getMessage() );
+            status.getError().printStackTrace();
+            System.err.println( status.getError().getMessage() );
             System.exit( status.getExitCode() );
         }
     }
 
     private static BootOptions loadBootOptions()
-        throws BootException
+            throws BootException
     {
         final String bootDef = System.getProperty( BOOT_DEFAULTS_PROP );
         File bootDefaults = null;
@@ -99,8 +98,7 @@ public class Booter
         }
 
         final ServiceLoader<BootOptions> loader = ServiceLoader.load( BootOptions.class );
-        final BootOptions options = loader.iterator()
-                                          .next();
+        final BootOptions options = loader.iterator().next();
 
         try
         {
@@ -143,11 +141,10 @@ public class Booter
 
     private Configurator configurator;
 
-
     private AppLifecycleManager lifecycleManager;
 
     private void initialize( final BootOptions options )
-        throws BootException
+            throws BootException
     {
         this.options = options;
 
@@ -165,11 +162,12 @@ public class Booter
     }
 
     public BootStatus runAndWait( final BootOptions bootOptions )
-        throws BootException
+            throws BootException
     {
         BootStatus status = start( bootOptions );
-        if (!status.isSuccess()) {
-            return  status;
+        if ( !status.isSuccess() )
+        {
+            return status;
         }
 
         logger.info( "Setting up shutdown hook..." );
@@ -203,34 +201,42 @@ public class Booter
 
     public BootStatus deploy()
     {
-        deployer = container.instance()
-                            .select( Deployer.class )
-                            .get();
+        deployer = container.instance().select( Deployer.class ).get();
         BootStatus status = deployer.deploy( options );
 
-        return status == null ? new BootStatus(ERR_STARTING, new IllegalStateException("Deployment failed")) : status;
+        return status == null ?
+                new BootStatus( ERR_STARTING, new IllegalStateException( "Deployment failed" ) ) :
+                status;
     }
 
     public BootStatus start( final BootOptions bootOptions )
-        throws BootException
+            throws BootException
     {
         initialize( bootOptions );
         logger.info( "Booter running: " + this );
 
         BootStatus status = configure();
-        if (status != null)
+        if ( status != null )
+        {
             return status;
-        startLifecycle();
+        }
+
+        try
+        {
+            startLifecycle();
+        }
+        catch ( AppLifecycleException e )
+        {
+            throw new BootException( "Application startup failed. Reason: %s", e, e.getMessage() );
+        }
 
         return deploy();
     }
 
     public BootStatus configure()
     {
-        final Instance<Configurator> selection = container.instance()
-                                                          .select( Configurator.class );
-        if ( !selection.iterator()
-                       .hasNext() )
+        final Instance<Configurator> selection = container.instance().select( Configurator.class );
+        if ( !selection.iterator().hasNext() )
         {
             return null;
         }
@@ -239,25 +245,27 @@ public class Booter
         try
         {
             configurator.load( options );
-            return  null;
+            return null;
         }
         catch ( final ConfiguratorException e )
         {
-            return new BootStatus(ERR_LOAD_CONFIG, e);
+            return new BootStatus( ERR_LOAD_CONFIG, e );
         }
     }
 
     public void startLifecycle()
+            throws AppLifecycleException
     {
-        final Instance<AppLifecycleManager> selection = container.instance()
-                                                                 .select( AppLifecycleManager.class );
-        if ( !selection.iterator()
-                       .hasNext() )
+        final Instance<AppLifecycleManager> selection = container.instance().select( AppLifecycleManager.class );
+        if ( !selection.iterator().hasNext() )
         {
             return;
         }
 
         lifecycleManager = selection.get();
+
+        logger.info( "Starting up application with lifecycle manager: {}", lifecycleManager );
+        lifecycleManager.startup();
     }
 
     public void stop()

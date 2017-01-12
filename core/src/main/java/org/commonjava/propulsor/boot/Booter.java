@@ -32,6 +32,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ServiceLoader;
 
+import static org.commonjava.propulsor.boot.BootOptions.BOOT_DEFAULTS_PROP;
 import static org.commonjava.propulsor.boot.BootStatus.ERR_LOAD_CONFIG;
 import static org.commonjava.propulsor.boot.BootStatus.ERR_LOAD_FROM_SYSPROPS;
 import static org.commonjava.propulsor.boot.BootStatus.ERR_PARSE_ARGS;
@@ -39,9 +40,6 @@ import static org.commonjava.propulsor.boot.BootStatus.ERR_STARTING;
 
 public class Booter
 {
-
-    private static final String BOOT_DEFAULTS_PROP = "boot.properties";
-
     public static void main( final String[] args )
     {
         BootOptions options = null;

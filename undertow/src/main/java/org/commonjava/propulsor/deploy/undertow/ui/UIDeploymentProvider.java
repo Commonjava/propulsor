@@ -19,18 +19,22 @@ import io.undertow.servlet.api.DeploymentInfo;
 import io.undertow.servlet.api.ServletInfo;
 import io.undertow.servlet.util.ImmediateInstanceFactory;
 
+import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Alternative;
+import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.commonjava.propulsor.deploy.undertow.UndertowDeploymentProvider;
 
-@Alternative
-@Named
+@ApplicationScoped
 public class UIDeploymentProvider
     implements UndertowDeploymentProvider
 {
 
+    @Inject
     private UIServlet servlet;
+
+    public UIDeploymentProvider() {}
 
     public UIDeploymentProvider( UIServlet servlet )
     {

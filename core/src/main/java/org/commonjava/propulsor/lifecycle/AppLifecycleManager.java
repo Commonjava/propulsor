@@ -84,7 +84,7 @@ public class AppLifecycleManager {
     private void migrate()
             throws AppLifecycleException
     {
-        Collections.sort( startupActions, PRIORITY_COMPARATOR );
+        Collections.sort( migrationActions, PRIORITY_COMPARATOR );
 
         for ( final MigrationAction action : migrationActions )
         {
@@ -95,7 +95,7 @@ public class AppLifecycleManager {
     private void boot()
             throws AppLifecycleException
     {
-        Collections.sort( startupActions, PRIORITY_COMPARATOR );
+        Collections.sort( bootupActions, PRIORITY_COMPARATOR );
 
         for ( final BootupAction action : bootupActions )
         {
@@ -104,7 +104,7 @@ public class AppLifecycleManager {
     }
 
     public void stop() {
-        Collections.sort( startupActions, PRIORITY_COMPARATOR );
+        Collections.sort( shutdownActions, PRIORITY_COMPARATOR );
 
         for (final ShutdownAction shutdownAction : shutdownActions) {
             shutdownAction.shutdown();

@@ -25,6 +25,7 @@ import java.util.Set;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.inject.Any;
 import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 import javax.servlet.ServletException;
@@ -35,11 +36,14 @@ import org.commonjava.propulsor.boot.BootStatus;
 import org.commonjava.propulsor.boot.PortFinder;
 import org.commonjava.propulsor.deploy.Deployer;
 import org.commonjava.propulsor.deploy.undertow.util.DeploymentInfoUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @ApplicationScoped
 public class UndertowDeployer
     implements Deployer
 {
+    private final Logger logger = LoggerFactory.getLogger( getClass() );
 
     @Inject
     private Instance<UndertowDeploymentProvider> deployments;
@@ -72,6 +76,7 @@ public class UndertowDeployer
         deploymentProviders = new HashSet<>();
         for ( final UndertowDeploymentProvider fac : deployments )
         {
+            logger.debug("Add deployment: " + fac.toString());
             deploymentProviders.add( fac );
         }
 

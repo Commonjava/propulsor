@@ -20,6 +20,7 @@ import io.undertow.servlet.Servlets;
 import io.undertow.servlet.api.DeploymentInfo;
 import io.undertow.servlet.api.ServletInfo;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -39,6 +40,9 @@ import org.jboss.resteasy.plugins.server.servlet.HttpServlet30Dispatcher;
 import org.jboss.resteasy.spi.ResteasyDeployment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import io.swagger.jaxrs.listing.ApiListingResource;
+import io.swagger.jaxrs.listing.SwaggerSerializers;
 
 // TODO: Is it really right to make this extend Application?? Not sure...
 @ApplicationScoped
@@ -134,7 +138,8 @@ public class ResteasyDeploymentProvider
         // TODO: This might not be right...
         allClasses.addAll( providerClasses );
         allClasses.add( CDIJacksonProvider.class );
-//        allClasses.add( JacksonJsonProvider.class );
+        //allClasses.add( JacksonJsonProvider.class );
+        allClasses.addAll( Arrays.asList( ApiListingResource.class, SwaggerSerializers.class ) );
 
         logger.debug( "Returning getClass() with: \n  {}", StringUtils.join( allClasses, "\n  " ) );
         return allClasses;

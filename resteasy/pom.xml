@@ -87,5 +87,12 @@
       <artifactId>weld-se-core</artifactId>
       <scope>provided</scope>
     </dependency>
+
+    <!-- Swagger -->
+    <dependency>
+      <groupId>io.swagger</groupId>
+      <artifactId>swagger-jaxrs</artifactId>
+    </dependency>
+
   </dependencies>
 </project>

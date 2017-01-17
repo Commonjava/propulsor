@@ -27,7 +27,7 @@
 
   <groupId>org.commonjava.propulsor</groupId>
   <artifactId>propulsor-parent</artifactId>
-  <version>1.2-SNAPSHOT</version>
+  <version>1.2</version>
   <packaging>pom</packaging>
 
   <name>Propulsor :: Parent</name>
@@ -50,7 +50,7 @@
     <connection>scm:git:https://github.com/Commonjava/propulsor.git</connection>
     <developerConnection>scm:git:git@github.com:Commonjava/propulsor.git</developerConnection>
     <url>https://github.com/Commonjava/propulsor</url>
-    <tag>HEAD</tag>
+    <tag>propulsor-parent-1.2</tag>
   </scm>
 
   <dependencyManagement>
@@ -66,22 +66,22 @@
       <dependency>
         <groupId>org.commonjava.propulsor.client</groupId>
         <artifactId>propulsor-client-http</artifactId>
-        <version>1.2-SNAPSHOT</version>
+        <version>1.2</version>
       </dependency>
       <dependency>
         <groupId>org.commonjava.propulsor</groupId>
         <artifactId>propulsor-core</artifactId>
-        <version>1.2-SNAPSHOT</version>
+        <version>1.2</version>
       </dependency>
       <dependency>
         <groupId>org.commonjava.propulsor</groupId>
         <artifactId>propulsor-undertow</artifactId>
-        <version>1.2-SNAPSHOT</version>
+        <version>1.2</version>
       </dependency>
       <dependency>
         <groupId>org.commonjava.propulsor</groupId>
         <artifactId>propulsor-resteasy</artifactId>
-        <version>1.2-SNAPSHOT</version>
+        <version>1.2</version>
       </dependency>
       
       <!-- START: JAX-RS support -->

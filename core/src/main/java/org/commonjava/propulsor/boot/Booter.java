@@ -23,7 +23,6 @@ import org.commonjava.propulsor.lifecycle.AppLifecycleException;
 import org.commonjava.propulsor.lifecycle.AppLifecycleManager;
 import org.jboss.weld.environment.se.Weld;
 import org.jboss.weld.environment.se.WeldContainer;
-import org.jboss.weld.exceptions.IllegalStateException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

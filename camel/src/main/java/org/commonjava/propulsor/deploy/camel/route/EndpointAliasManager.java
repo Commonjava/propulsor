@@ -5,12 +5,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Contains aliases from keys that can be used within route definitions, to actual route URIs that define a protocol
- * for the route. This provides the opportunity to change deployment topologies for the same application by simply
- * changing the routing aliases.
+ * Contains aliases from keys that can be used within route definitions, to actual endpoint URIs that define a protocol
+ * for the endpoint. This provides the opportunity to change deployment topologies for the same application by simply
+ * changing the endpoint aliases.
  */
 @ApplicationScoped
-public class RouteAliasManager
+public class EndpointAliasManager
 {
     private Map<String, String> routeMap = new HashMap<>();
 

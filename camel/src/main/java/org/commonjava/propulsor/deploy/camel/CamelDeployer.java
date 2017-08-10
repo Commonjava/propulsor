@@ -5,7 +5,7 @@ import org.commonjava.propulsor.boot.BootOptions;
 import org.commonjava.propulsor.boot.BootStatus;
 import org.commonjava.propulsor.deploy.Deployer;
 import org.commonjava.propulsor.deploy.camel.ctx.CamelContextualizer;
-import org.commonjava.propulsor.deploy.camel.route.RoutingSetup;
+import org.commonjava.propulsor.deploy.camel.route.RouteProvider;
 import org.commonjava.propulsor.lifecycle.AppLifecycleException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +30,7 @@ public class CamelDeployer
     private Main camelMain;
 
     @Inject
-    private Instance<RoutingSetup> routeBuilders;
+    private Instance<RouteProvider> routeBuilders;
 
     @Inject
     private Instance<CamelContextualizer> contextualizers;
@@ -77,7 +77,7 @@ public class CamelDeployer
 
         if ( routeBuilders != null )
         {
-            for ( RoutingSetup rb : routeBuilders )
+            for ( RouteProvider rb : routeBuilders )
             {
                 try
                 {

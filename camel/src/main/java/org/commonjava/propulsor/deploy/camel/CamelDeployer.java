@@ -1,5 +1,6 @@
 package org.commonjava.propulsor.deploy.camel;
 
+import org.apache.camel.CamelContext;
 import org.apache.camel.main.Main;
 import org.commonjava.propulsor.boot.BootOptions;
 import org.commonjava.propulsor.boot.BootStatus;
@@ -35,10 +36,23 @@ public class CamelDeployer
     @Inject
     private Instance<CamelContextualizer> contextualizers;
 
+    private CamelContext context;
+
     @Produces
     public Main getCamelMain()
     {
         return camelMain;
+    }
+
+    @Produces
+    public synchronized CamelContext getCamelContext()
+    {
+        if ( context == null )
+        {
+            context = camelMain.getOrCreateCamelContext();
+        }
+
+        return context;
     }
 
     @Override
@@ -66,7 +80,7 @@ public class CamelDeployer
             {
                 try
                 {
-                    ccc.contextualize( camelMain.getOrCreateCamelContext() );
+                    ccc.contextualize( getCamelContext() );
                 }
                 catch ( AppLifecycleException e )
                 {
@@ -81,7 +95,7 @@ public class CamelDeployer
             {
                 try
                 {
-                    rb.addRoutesToCamelContext( camelMain.getOrCreateCamelContext() );
+                    rb.addRoutesToCamelContext( getCamelContext() );
                 }
                 catch ( Exception e )
                 {

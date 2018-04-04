@@ -17,6 +17,10 @@ package org.commonjava.propulsor.deploy.undertow;
 
 import io.undertow.servlet.api.DeploymentInfo;
 
+/**
+ * Specifies the information normally configured in the web.xml file for a WAR file. This is where you configure
+ * servlets, filters, etc.
+ */
 public interface UndertowDeploymentProvider
 {
 

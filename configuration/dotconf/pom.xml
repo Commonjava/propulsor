@@ -19,19 +19,19 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.commonjava.util</groupId>
-    <artifactId>configuration</artifactId>
-    <version>0.9-SNAPSHOT</version>
+    <groupId>org.commonjava.propulsor.config</groupId>
+    <artifactId>propulsor-configuration</artifactId>
+    <version>1.3-SNAPSHOT</version>
   </parent>
+
+  <artifactId>propulsor-configuration-dotconf</artifactId>
   
-  <artifactId>configuration-dotconf</artifactId>
-  
-  <name>Consolidated Configuration :: .conf Format</name>
+  <name>Propulsor :: Consolidated Configuration :: .conf Format</name>
   
   <dependencies>
     <dependency>
-      <groupId>org.commonjava.util</groupId>
-      <artifactId>configuration-api</artifactId>
+      <groupId>org.commonjava.propulsor.config</groupId>
+      <artifactId>propulsor-configuration-api</artifactId>
     </dependency>
     
     <dependency>
@@ -47,19 +47,4 @@
       <artifactId>commons-io</artifactId>
     </dependency>
   </dependencies>
-  
-  <build>
-    <pluginManagement>
-        <plugins>
-            <plugin>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                  <excludes>
-                    <exclude>**/fixture/*.java</exclude>
-                  </excludes>
-                </configuration>
-            </plugin>
-        </plugins>
-    </pluginManagement>
-  </build>
 </project>

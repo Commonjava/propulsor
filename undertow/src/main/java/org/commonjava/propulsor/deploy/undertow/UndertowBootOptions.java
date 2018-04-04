@@ -15,14 +15,12 @@
  */
 package org.commonjava.propulsor.deploy.undertow;
 
-import org.commonjava.propulsor.boot.BootOptions;
-
 public interface UndertowBootOptions
 {
 
     UndertowBootOptions DEFAULT = new UndertowBootOptions()
     {
-        private Integer port;
+        public Integer port;
 
         @Override
         public String getContextPath()
@@ -53,6 +51,7 @@ public interface UndertowBootOptions
         {
             this.port = port;
         }
+
     };
 
     String getContextPath();

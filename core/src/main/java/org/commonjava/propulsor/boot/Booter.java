@@ -128,6 +128,8 @@ public class Booter
 
     private final Logger logger = LoggerFactory.getLogger( getClass() );
 
+    private BootStatus status;
+
     private BootOptions options;
 
     private Weld weld;
@@ -161,7 +163,7 @@ public class Booter
     public BootStatus runAndWait( final BootOptions bootOptions )
             throws BootException
     {
-        BootStatus status = start( bootOptions );
+        status = start( bootOptions );
         if ( !status.isSuccess() )
         {
             return status;
@@ -182,6 +184,21 @@ public class Booter
                 logger.info( "{} exiting", options.getApplicationName() );
             }
         }
+
+        return status;
+    }
+
+    public BootStatus run( final BootOptions bootOptions )
+            throws BootException
+    {
+        status = start( bootOptions );
+        if ( !status.isSuccess() )
+        {
+            return status;
+        }
+
+        logger.info( "Setting up shutdown hook..." );
+        lifecycleManager.installShutdownHook();
 
         return status;
     }
@@ -265,16 +282,21 @@ public class Booter
         lifecycleManager.startup();
     }
 
-    public void stop()
+    public BootStatus stop()
     {
-        if ( container != null )
+        if ( status.isSuccess() )
         {
-            deployer.stop();
-            if ( lifecycleManager != null )
+            if ( container != null )
             {
-                lifecycleManager.stop();
+                deployer.stop();
+                if ( lifecycleManager != null )
+                {
+                    lifecycleManager.stop();
+                }
+                weld.shutdown();
             }
-            weld.shutdown();
         }
+
+        return status;
     }
 }

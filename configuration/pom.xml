@@ -15,98 +15,25 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 
--->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+  -->
+  <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
-  <parent>
-    <groupId>org.commonjava</groupId>
-    <artifactId>commonjava</artifactId>
-    <version>11</version>
-  </parent>
-  
-  <groupId>org.commonjava.util</groupId>
-  <artifactId>configuration</artifactId>
-  <version>0.9-SNAPSHOT</version>
-  <packaging>pom</packaging>
+    <parent>
+      <groupId>org.commonjava.propulsor</groupId>
+      <artifactId>propulsor-parent</artifactId>
+      <version>1.3-SNAPSHOT</version>
+    </parent>
 
-  <name>Consolidated Configuration Support</name>
-  <inceptionYear>2011</inceptionYear>
-  
-  <modules>
-    <module>api</module>
-    <module>dotconf</module>
-    <module>yaml</module>
-  </modules>
-  
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  </properties>
+    <groupId>org.commonjava.propulsor.config</groupId>
+    <artifactId>propulsor-configuration</artifactId>
+    <packaging>pom</packaging>
 
-  <scm>
-    <connection>scm:git:https://github.com/Commonjava/configuration.git</connection>
-    <developerConnection>scm:git:git@github.com:Commonjava/configuration.git</developerConnection>
-    <url>http://github.com/Commonjava/configuration</url>
-    <tag>HEAD</tag>
-  </scm>
+    <name>Propulsor :: Consolidated Configuration Support</name>
 
-  <dependencies>
-    <dependency>
-      <groupId>javax.enterprise</groupId>
-      <artifactId>cdi-api</artifactId>
-    </dependency>
-    
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>ch.qos.logback</groupId>
-      <artifactId>logback-classic</artifactId>
-    </dependency>
-  </dependencies>
-  
-  <build>
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <artifactId>maven-compiler-plugin</artifactId>
-          <configuration>
-            <source>1.6</source>
-            <target>1.6</target>
-          </configuration>
-        </plugin>
-      </plugins>
-    </pluginManagement>
-  </build>
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.commonjava.boms</groupId>
-        <artifactId>web-commons-bom</artifactId>
-        <version>9</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.commonjava.util</groupId>
-        <artifactId>configuration-api</artifactId>
-        <version>0.9-SNAPSHOT</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.xbean</groupId>
-        <artifactId>xbean-reflect</artifactId>
-        <version>3.7</version>
-      </dependency>
-      <dependency>
-        <groupId>org.codehaus.plexus</groupId>
-        <artifactId>plexus-interpolation</artifactId>
-        <version>1.19</version>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
-</project>
+    <modules>
+      <module>core</module>
+      <module>dotconf</module>
+      <module>yaml</module>
+    </modules>
+  </project>

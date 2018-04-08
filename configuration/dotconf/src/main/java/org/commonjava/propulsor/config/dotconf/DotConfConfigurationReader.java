@@ -30,13 +30,8 @@ import javax.inject.Inject;
 import org.codehaus.plexus.interpolation.InterpolationException;
 import org.codehaus.plexus.interpolation.PropertiesBasedValueSource;
 import org.codehaus.plexus.interpolation.StringSearchInterpolator;
-import org.commonjava.web.config.ConfigurationException;
-import org.commonjava.web.config.ConfigurationListener;
-import org.commonjava.web.config.ConfigurationReader;
-import org.commonjava.web.config.ConfigurationRegistry;
-import org.commonjava.web.config.DefaultConfigurationListener;
-import org.commonjava.web.config.DefaultConfigurationRegistry;
-import org.commonjava.web.config.section.ConfigurationSectionListener;
+import org.commonjava.propulsor.config.*;
+import org.commonjava.propulsor.config.section.ConfigurationSectionListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -26,13 +26,13 @@ import java.io.ByteArrayOutputStream;
 import java.util.List;
 import java.util.Map;
 
-import org.commonjava.web.config.ConfigurationRegistry;
-import org.commonjava.web.config.DefaultConfigurationListener;
-import org.commonjava.web.config.DefaultConfigurationRegistry;
+import org.commonjava.propulsor.config.ConfigurationRegistry;
+import org.commonjava.propulsor.config.DefaultConfigurationListener;
+import org.commonjava.propulsor.config.DefaultConfigurationRegistry;
 import org.commonjava.propulsor.config.dotconf.fixture.ListEx;
 import org.commonjava.propulsor.config.dotconf.fixture.StringMap;
-import org.commonjava.web.config.section.ConfigurationSectionListener;
-import org.commonjava.web.config.section.MapSectionListener;
+import org.commonjava.propulsor.config.section.ConfigurationSectionListener;
+import org.commonjava.propulsor.config.section.MapSectionListener;
 import org.junit.Test;
 
 public class DotConfMapParsingTest
@@ -123,7 +123,7 @@ public class DotConfMapParsingTest
     {
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-        writeLines( lines, LINE_SEPARATOR, baos );
+        writeLines( lines, LINE_SEPARATOR, baos, "UTF-8" );
 
         final MapSectionListener sectionListener = new MapSectionListener();
 

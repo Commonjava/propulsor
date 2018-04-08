@@ -15,11 +15,10 @@
  */
 package org.commonjava.propulsor.deploy.undertow.ui;
 
-import java.io.File;
+import org.commonjava.propulsor.config.annotation.ConfigName;
+import org.commonjava.propulsor.config.annotation.SectionName;
 
-import org.commonjava.web.config.annotation.ConfigName;
-import org.commonjava.web.config.annotation.ConfigNames;
-import org.commonjava.web.config.annotation.SectionName;
+import java.io.File;
 
 @SectionName("ui")
 public class UIConfiguration {

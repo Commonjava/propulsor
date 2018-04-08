@@ -24,14 +24,14 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.List;
 
+import org.commonjava.propulsor.config.ConfigurationRegistry;
+import org.commonjava.propulsor.config.DefaultConfigurationListener;
+import org.commonjava.propulsor.config.DefaultConfigurationRegistry;
 import org.commonjava.propulsor.config.dotconf.fixture.ListEx;
 import org.commonjava.propulsor.config.dotconf.fixture.Simpleton;
-import org.commonjava.web.config.ConfigurationRegistry;
-import org.commonjava.web.config.DefaultConfigurationListener;
-import org.commonjava.web.config.DefaultConfigurationRegistry;
 import org.commonjava.propulsor.config.dotconf.fixture.SimpletonInt;
-import org.commonjava.web.config.section.BeanSectionListener;
-import org.commonjava.web.config.section.ConfigurationSectionListener;
+import org.commonjava.propulsor.config.section.BeanSectionListener;
+import org.commonjava.propulsor.config.section.ConfigurationSectionListener;
 import org.junit.Test;
 
 public class DotConfBeanParsingTest
@@ -122,7 +122,7 @@ public class DotConfBeanParsingTest
     {
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-        writeLines( lines, LINE_SEPARATOR, baos );
+        writeLines( lines, LINE_SEPARATOR, baos, "UTF-8" );
 
         final ConfigurationRegistry registry =
             new DefaultConfigurationRegistry(

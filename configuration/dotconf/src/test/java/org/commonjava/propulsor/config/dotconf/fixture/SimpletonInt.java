@@ -15,8 +15,8 @@
  */
 package org.commonjava.propulsor.config.dotconf.fixture;
 
-import org.commonjava.web.config.annotation.ConfigNames;
-import org.commonjava.web.config.annotation.SectionName;
+import org.commonjava.propulsor.config.annotation.ConfigNames;
+import org.commonjava.propulsor.config.annotation.SectionName;
 
 @SectionName( "object" )
 public class SimpletonInt

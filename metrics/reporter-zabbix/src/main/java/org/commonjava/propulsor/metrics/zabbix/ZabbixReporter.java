@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.commonjava.propulsor.metrics.zabbix.reporter;
+package org.commonjava.propulsor.metrics.zabbix;
 
 import com.codahale.metrics.Counter;
 import com.codahale.metrics.Gauge;
@@ -41,7 +41,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+
+import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.commonjava.propulsor.metrics.conf.MetricsConfig.DURATION_TIMEUNIT;
+import static org.commonjava.propulsor.metrics.conf.MetricsConfig.RATE_TIMEUNIT;
 
 /**
  * Created by xiabai on 3/29/17.
@@ -56,22 +59,29 @@ public class ZabbixReporter
 
     private final ZabbixReporterConfig config;
 
-    private final MetricsConfig metricsConfig;
+    private final String systemPrefix;
 
     public ZabbixReporter( ZabbixJsonRpcClient jsonRpcClient, final MetricRegistry registry, final MetricFilter filter,
-                           final ScheduledExecutorService executor, ZabbixReporterConfig config, MetricsConfig metricsConfig )
+                           final ScheduledExecutorService executor, ZabbixReporterConfig config,
+                           MetricsConfig metricsConfig )
     {
-        super( registry, "Zabbix", filter, config.getRateUnit(), config.getDurationUnit(), executor );
+        super( registry, config.getLocalHostName(), filter, RATE_TIMEUNIT, DURATION_TIMEUNIT, executor );
         this.jsonRpcClient = jsonRpcClient;
         this.config = config;
-        this.metricsConfig = metricsConfig;
+        this.systemPrefix = metricsConfig.getInstancePrefix();
+    }
+
+    public void start() throws IOException, ZabbixConfigurationException
+    {
+        jsonRpcClient.start();
+        super.start( config.getReportSeconds(), SECONDS );
     }
 
     private DataObject toDataObject( String key, String keySuffix, Object value, long clock )
     {
         return DataObject.builder()
-                         .host( config.getHost() )
-                         .key( metricsConfig.getInstancePrefix() + key + keySuffix )
+                         .host( config.getZabbixHost() )
+                         .key( systemPrefix + key + keySuffix )
                          .clock( clock )
                          .value( String.valueOf( value ) )
                          .build();

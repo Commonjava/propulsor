@@ -19,8 +19,8 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.commonjava.propulsor</groupId>
-    <artifactId>propulsor-parent</artifactId>
+    <groupId>org.commonjava.propulsor.camel</groupId>
+    <artifactId>propulsor-camel</artifactId>
     <version>1.3-SNAPSHOT</version>
   </parent>
   
@@ -33,8 +33,8 @@
       <artifactId>propulsor-core</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.commonjava.propulsor</groupId>
-      <artifactId>propulsor-camel</artifactId>
+      <groupId>org.commonjava.propulsor.camel</groupId>
+      <artifactId>propulsor-camel-core</artifactId>
     </dependency>
     
     <dependency>

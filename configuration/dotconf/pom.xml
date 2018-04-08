@@ -31,7 +31,7 @@
   <dependencies>
     <dependency>
       <groupId>org.commonjava.propulsor.config</groupId>
-      <artifactId>propulsor-configuration-api</artifactId>
+      <artifactId>propulsor-configuration-core</artifactId>
     </dependency>
     
     <dependency>

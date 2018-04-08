@@ -22,7 +22,6 @@ import org.codehaus.plexus.interpolation.StringSearchInterpolator;
 import org.commonjava.propulsor.config.ConfigurationException;
 
 import static org.apache.commons.io.FileUtils.readLines;
-import static org.apache.commons.lang.StringUtils.join;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -77,6 +76,20 @@ public final class ConfigFileUtils
         final List<String> lines = readLinesWithIncludes( f, props, false );
 
         return new ByteArrayInputStream( join( lines, LS ).getBytes() );
+    }
+
+    private static String join( List<String> lines, String ls )
+    {
+        StringBuilder sb = new StringBuilder();
+        lines.forEach( line->{
+            if ( sb.length() > 0 )
+            {
+                sb.append( ls );
+            }
+            sb.append( line );
+        } );
+
+        return sb.toString();
     }
 
     public static List<String> readLinesWithIncludes( final File f )

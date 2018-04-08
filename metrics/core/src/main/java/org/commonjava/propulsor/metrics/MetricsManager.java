@@ -22,6 +22,7 @@ import com.codahale.metrics.health.HealthCheckRegistry;
 import org.commonjava.propulsor.metrics.conf.MetricsConfig;
 import org.commonjava.propulsor.metrics.healthcheck.ManagedHealthCheck;
 import org.commonjava.propulsor.metrics.spi.MetricsInitializer;
+import org.commonjava.propulsor.metrics.spi.ReporterConfigurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,6 +30,7 @@ import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
+import java.io.IOException;
 
 /**
  * Created by xiabai on 2/27/17.
@@ -51,6 +53,9 @@ public class MetricsManager
     private MetricsConfig config;
 
     @Inject
+    private Instance<ReporterConfigurator<?>> reporterConfigurators;
+
+    @Inject
     private HealthCheckRegistry healthCheckRegistry;
 
     @Inject
@@ -67,8 +72,35 @@ public class MetricsManager
 
         logger.debug( "Starting metrics subsystem..." );
 
-        healthChecks.stream().forEach( hc -> healthCheckRegistry.register( hc.getName(), hc ) );
-        initializers.stream().forEach( ( init)->init.initialize( metricRegistry, healthCheckRegistry ) );
+        if ( healthChecks != null )
+        {
+            healthChecks.forEach( hc -> healthCheckRegistry.register( hc.getName(), hc ) );
+        }
+
+        if ( initializers != null )
+        {
+            initializers.forEach( init -> {
+                try
+                {
+                    init.initialize( metricRegistry, healthCheckRegistry );
+                }
+                catch ( IOException e )
+                {
+                    final Logger logger = LoggerFactory.getLogger( getClass() );
+                    logger.error( String.format( "Failed to initialize metrics subsystem: %s. Error: %s", init,
+                                                 e.getMessage() ), e );
+                }
+                catch ( ManagedMetricsException e )
+                {
+                    e.printStackTrace();
+                }
+            } );
+        }
+
+        if ( reporterConfigurators != null )
+        {
+            reporterConfigurators.forEach( rc -> rc.computeEnabled( config ) );
+        }
     }
 
     public Timer getTimer( MetricNamed named )

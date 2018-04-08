@@ -91,7 +91,7 @@ public class ZabbixSocketHandler
             socket = new Socket();
 
             socket.setSoTimeout( config.getJsonRpcSocketTimeout() );
-            socket.connect( new InetSocketAddress( config.getHost(), config.getJsonRpcPort()), config.getJsonRpcConnectionTimeout() );
+            socket.connect( new InetSocketAddress( config.getZabbixHost(), config.getJsonRpcPort()), config.getJsonRpcConnectionTimeout() );
 
             inputStream = socket.getInputStream();
             outputStream = socket.getOutputStream();

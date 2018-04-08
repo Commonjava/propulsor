@@ -17,7 +17,7 @@ package org.commonjava.propulsor.metrics;
 
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.Timer;
-import org.commonjava.propulsor.metrics.conf.MetricsReportersConfig;
+import org.commonjava.propulsor.metrics.conf.MetricsConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,11 +41,10 @@ public class MetricsInterceptor
 
     private final MetricsManager manager;
 
-    @MetricsNamed
-    private final MetricsReportersConfig config;
+    private final MetricsConfig config;
 
     @Inject
-    public MetricsInterceptor( MetricsManager manager, MetricsReportersConfig config )
+    public MetricsInterceptor( MetricsManager manager, MetricsConfig config )
     {
         this.manager = manager;
         this.config = config;

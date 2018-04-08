@@ -15,7 +15,8 @@
  */
 package org.commonjava.propulsor.config.dotconf.fixture;
 
-import org.commonjava.web.config.annotation.SectionName;
+import org.commonjava.propulsor.config.annotation.ConfigName;
+import org.commonjava.propulsor.config.annotation.SectionName;
 
 @SectionName( "object" )
 public class Simpleton
@@ -41,6 +42,7 @@ public class Simpleton
         return one;
     }
 
+    @ConfigName( "one" )
     public void setOne( final String one )
     {
         this.one = one;
@@ -51,6 +53,7 @@ public class Simpleton
         return two;
     }
 
+    @ConfigName( "two" )
     public void setTwo( final String two )
     {
         this.two = two;

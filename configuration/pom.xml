@@ -34,6 +34,5 @@
     <modules>
       <module>core</module>
       <module>dotconf</module>
-      <module>yaml</module>
     </modules>
   </project>

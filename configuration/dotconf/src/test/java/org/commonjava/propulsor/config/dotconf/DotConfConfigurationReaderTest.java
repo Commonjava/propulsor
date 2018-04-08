@@ -15,24 +15,24 @@
  */
 package org.commonjava.propulsor.config.dotconf;
 
-import static org.apache.commons.io.IOUtils.LINE_SEPARATOR;
-import static org.apache.commons.io.IOUtils.writeLines;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.junit.Assert.assertThat;
+import org.commonjava.propulsor.config.ConfigurationRegistry;
+import org.commonjava.propulsor.config.DefaultConfigurationListener;
+import org.commonjava.propulsor.config.DefaultConfigurationRegistry;
+import org.commonjava.propulsor.config.dotconf.fixture.ListEx;
+import org.commonjava.propulsor.config.dotconf.fixture.SimpletonInt;
+import org.commonjava.propulsor.config.section.BeanSectionListener;
+import org.commonjava.propulsor.config.section.MapSectionListener;
+import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.List;
 import java.util.Map;
 
-import org.commonjava.propulsor.config.dotconf.fixture.ListEx;
-import org.commonjava.web.config.ConfigurationRegistry;
-import org.commonjava.web.config.DefaultConfigurationListener;
-import org.commonjava.web.config.DefaultConfigurationRegistry;
-import org.commonjava.propulsor.config.dotconf.fixture.SimpletonInt;
-import org.commonjava.web.config.section.BeanSectionListener;
-import org.commonjava.web.config.section.MapSectionListener;
-import org.junit.Test;
+import static org.apache.commons.io.IOUtils.LINE_SEPARATOR;
+import static org.apache.commons.io.IOUtils.writeLines;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.junit.Assert.assertThat;
 
 public class DotConfConfigurationReaderTest
 {
@@ -46,7 +46,7 @@ public class DotConfConfigurationReaderTest
                         "one=foo", "two: 2" );
 
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        writeLines( lines, LINE_SEPARATOR, baos );
+        writeLines( lines, LINE_SEPARATOR, baos, "UTF-8" );
 
         final DefaultConfigurationListener configListener =
             new DefaultConfigurationListener( new BeanSectionListener<SimpletonInt>( SimpletonInt.class ) ).with( "mappings",

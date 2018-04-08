@@ -1,6 +1,8 @@
 package org.commonjava.propulsor.metrics.conf;
 
 import org.commonjava.propulsor.config.ConfigurationException;
+import org.commonjava.propulsor.config.annotation.ConfigName;
+import org.commonjava.propulsor.config.section.BeanSectionListener;
 import org.commonjava.propulsor.config.section.ConfigurationSectionListener;
 
 import java.util.ArrayList;
@@ -10,6 +12,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 import static java.lang.Boolean.FALSE;
@@ -24,7 +27,7 @@ import static java.lang.Boolean.FALSE;
  * applies.
  */
 public abstract class EnabledMetrics<T>
-        implements ConfigurationSectionListener<T>
+        extends BeanSectionListener<T>
 {
     public static final String ENABLED = "enabled";
 
@@ -49,7 +52,13 @@ public abstract class EnabledMetrics<T>
 
     public boolean isEnabled( String name )
     {
-        Boolean enabled = enabledMetricMap.get( name );
+        Boolean enabled = this.enabled;
+        if ( enabled != null )
+        {
+            return enabled;
+        }
+
+        enabled = enabledMetricMap.get( name );
         if ( enabled != null )
         {
             return enabled;
@@ -87,52 +96,51 @@ public abstract class EnabledMetrics<T>
         return enabled;
     }
 
-    @Override
-    public void sectionStarted( final String name )
-            throws ConfigurationException
+    @ConfigName( "enabled" )
+    public void setEnabled(boolean enabled)
     {
-        // NOP
+        this.enabled = enabled;
     }
 
-    @Override
-    public void parameter( final String name, final String value )
+    @ConfigName( BeanSectionListener.UNSET_PROPERTIES_MAP )
+    public void setMapParameters( final Map<String, Object> params )
             throws ConfigurationException
     {
-        String enabledPrefix = getEnabledPrefix();
-        if ( enabledPrefix == null )
-        {
-            enabledPrefix = "";
-        }
+        params.forEach( (name,v)->{
+            String value = v == null ? null : String.valueOf( v );
 
-        if ( ENABLED.equals( name ) )
-        {
-            this.enabled = Boolean.parseBoolean( value );
-        }
-        else if ( name.startsWith( enabledPrefix ) && name.endsWith( ENABLED ) && name.length() > (
-                enabledPrefix.length() + ENABLED.length() + 1 ) )
-        {
-            String trimmed = name.substring( enabledPrefix.length(), name.length() - ENABLED.length() - 1 );
-            set( trimmed, Boolean.valueOf( value ) );
-        }
-        else
-        {
-            handleParam( name, value );
-        }
-    }
+            String enabledPrefix = getEnabledPrefix();
+            if ( enabledPrefix == null )
+            {
+                enabledPrefix = "";
+            }
 
-    @Override
-    public void sectionComplete( final String name )
-            throws ConfigurationException
-    {
-        // NOP
+            if ( name.startsWith( enabledPrefix ) && name.endsWith( ENABLED ) && name.length() > (
+                            enabledPrefix.length() + ENABLED.length() + 1 ) )
+            {
+                String trimmed = name.substring( enabledPrefix.length(), name.length() - ENABLED.length() - 1 );
+                set( trimmed, Boolean.valueOf( value ) );
+            }
+        } );
     }
 
     protected abstract String getEnabledPrefix();
 
-    protected abstract void handleParam( String name, String value );
+    public final void computeEnabled( MetricsConfig config )
+    {
+        final EnabledMetrics<T> mine = this;
+        config.getEnabledMetrics().forEach( (name,flag)->{
+            mine.computeEnabledIfAbsent( name, n -> flag );
+        } );
+    }
 
-//    protected void handleParam( String name, String value )
-//    {
-//        // NOP
-//    }
+    protected final Map<String, Boolean> getEnabledMetrics()
+    {
+        return enabledMetricMap;
+    }
+
+    public final void computeEnabledIfAbsent( String name, Function<String, Boolean> func )
+    {
+        enabledMetricMap.computeIfAbsent( name, func );
+    }
 }

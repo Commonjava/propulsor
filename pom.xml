@@ -22,7 +22,7 @@
   <parent>
     <groupId>org.commonjava</groupId>
     <artifactId>commonjava</artifactId>
-    <version>9</version>
+    <version>12</version>
   </parent>
 
   <groupId>org.commonjava.propulsor</groupId>
@@ -36,11 +36,16 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <jhttpcVersion>1.3</jhttpcVersion>
-    <resteasyVersion>3.0.12.Final</resteasyVersion>
-    <undertowVersion>1.1.2.Final</undertowVersion>
-    <jacksonVersion>2.4.1</jacksonVersion>
-    <swaggerVersion>1.5.9</swaggerVersion>
+    <jhttpcVersion>1.6</jhttpcVersion>
+
+    <resteasyVersion>3.1.4.Final</resteasyVersion>
+    <undertowVersion>1.4.16.Final</undertowVersion>
+    <jacksonVersion>2.9.0</jacksonVersion>
+    <weldVersion>2.4.4.Final</weldVersion>
+    <swaggerVersion>1.5.16</swaggerVersion>
+    <logbackVersion>1.2.3</logbackVersion>
+    <slf4jVersion>1.7.25</slf4jVersion>
+
     <javaVersion>1.8</javaVersion>
     <maven.compiler.source>${javaVersion}</maven.compiler.source>
     <maven.compiler.target>${javaVersion}</maven.compiler.target>
@@ -55,12 +60,13 @@
 
   <dependencyManagement>
     <dependencies>
+      <!-- Camel BOM -->
       <dependency>
-        <groupId>org.commonjava.boms</groupId>
-        <artifactId>web-commons-bom</artifactId>
-        <version>21</version>
-        <type>pom</type>
+        <groupId>org.apache.camel</groupId>
+        <artifactId>camel-parent</artifactId>
+        <version>2.19.1</version>
         <scope>import</scope>
+        <type>pom</type>
       </dependency>
       
       <dependency>
@@ -83,7 +89,39 @@
         <artifactId>propulsor-resteasy</artifactId>
         <version>1.3-SNAPSHOT</version>
       </dependency>
-      
+      <dependency>
+        <groupId>org.commonjava.propulsor</groupId>
+        <artifactId>propulsor-camel</artifactId>
+        <version>1.3-SNAPSHOT</version>
+      </dependency>
+      <dependency>
+        <groupId>org.commonjava.propulsor</groupId>
+        <artifactId>propulsor-camel-activemq-embedded</artifactId>
+        <version>1.3-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.commonjava.util</groupId>
+        <artifactId>configuration-api</artifactId>
+        <version>0.8</version>
+      </dependency>
+      <dependency>
+        <groupId>org.commonjava.util</groupId>
+        <artifactId>configuration-dotconf</artifactId>
+        <version>0.8</version>
+      </dependency>
+
+      <dependency>
+        <groupId>commons-io</groupId>
+        <artifactId>commons-io</artifactId>
+        <version>2.5</version>
+      </dependency>
+      <dependency>
+        <groupId>commons-lang</groupId>
+        <artifactId>commons-lang</artifactId>
+        <version>2.6</version>
+      </dependency>
+
       <!-- START: JAX-RS support -->
       <dependency>
           <groupId>io.undertow</groupId>
@@ -95,6 +133,33 @@
           <artifactId>undertow-servlet</artifactId>
           <version>${undertowVersion}</version>
       </dependency>
+
+      <dependency>
+        <groupId>org.jboss.resteasy</groupId>
+        <artifactId>jaxrs-api</artifactId>
+        <version>3.0.12.Final</version>
+      </dependency>
+      <dependency>
+        <groupId>org.jboss.resteasy</groupId>
+        <artifactId>resteasy-cdi</artifactId>
+        <version>${resteasyVersion}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.jboss.resteasy</groupId>
+        <artifactId>resteasy-jaxrs</artifactId>
+        <version>${resteasyVersion}</version>
+      </dependency>
+<!--       <dependency>
+        <groupId>org.jboss.resteasy</groupId>
+        <artifactId>async-http-servlet-3.0</artifactId>
+        <version>${resteasyVersion}</version>
+      </dependency>
+ -->      <dependency>
+        <groupId>org.jboss.spec.javax.servlet</groupId>
+        <artifactId>jboss-servlet-api_3.0_spec</artifactId>
+        <version>1.0.2.Final</version>
+      </dependency>
+
       <dependency>
         <groupId>com.fasterxml.jackson.core</groupId>
         <artifactId>jackson-databind</artifactId>
@@ -119,15 +184,21 @@
       </dependency>
 
       <dependency>
+        <groupId>javax.inject</groupId>
+        <artifactId>javax.inject</artifactId>
+        <version>1</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
         <groupId>javax.enterprise</groupId>
         <artifactId>cdi-api</artifactId>
-        <version>1.2</version>
+        <version>2.0</version>
         <scope>provided</scope>
       </dependency>
       <dependency>
         <groupId>args4j</groupId>
         <artifactId>args4j</artifactId>
-        <version>2.0.12</version>
+        <version>2.33</version>
       </dependency>
       <dependency>
         <groupId>org.apache.xbean</groupId>
@@ -140,14 +211,20 @@
         <version>1.19</version>
       </dependency>
       <dependency>
+        <groupId>org.jboss.weld</groupId>
+        <artifactId>weld-api</artifactId>
+        <version>2.4.SP1</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
         <groupId>org.jboss.weld.se</groupId>
         <artifactId>weld-se</artifactId>
-        <version>2.3.2.Final</version>
+        <version>${weldVersion}</version>
       </dependency>
       <dependency>
         <groupId>org.jboss.weld.se</groupId>
         <artifactId>weld-se-core</artifactId>
-        <version>2.3.2.Final</version>
+        <version>${weldVersion}</version>
       </dependency>
 
       <!-- Swagger -->
@@ -156,10 +233,64 @@
         <artifactId>swagger-jaxrs</artifactId>
         <version>${swaggerVersion}</version>
       </dependency>
+
+
+      <dependency>
+        <groupId>ch.qos.logback</groupId>
+        <artifactId>logback-classic</artifactId>
+        <version>${logbackVersion}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-api</artifactId>
+        <version>${slf4jVersion}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-ext</artifactId>
+        <version>${slf4jVersion}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>log4j-over-slf4j</artifactId>
+        <version>${slf4jVersion}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>jcl-over-slf4j</artifactId>
+        <version>${slf4jVersion}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>jul-over-slf4j</artifactId>
+        <version>${slf4jVersion}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>4.12</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.hamcrest</groupId>
+        <artifactId>hamcrest-core</artifactId>
+        <version>1.3</version>
+        <scope>test</scope>
+      </dependency>
+
     </dependencies>
   </dependencyManagement>
   
   <dependencies>
+    <dependency>
+      <groupId>javax.inject</groupId>
+      <artifactId>javax.inject</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>javax.enterprise</groupId>
+      <artifactId>cdi-api</artifactId>
+    </dependency>
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
@@ -171,6 +302,10 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.hamcrest</groupId>
+      <artifactId>hamcrest-core</artifactId>
     </dependency>
   </dependencies>
   
@@ -207,5 +342,7 @@
     <module>resteasy</module>
     <module>undertow</module>
     <module>clients</module>
+    <module>camel</module>
+    <module>camel-activemq-embedded</module>
   </modules>
 </project>

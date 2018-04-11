@@ -29,6 +29,7 @@ import java.net.URL;
 import javax.activation.FileTypeMap;
 import javax.activation.MimetypesFileTypeMap;
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.inject.Instance;
 import javax.enterprise.inject.spi.CDI;
 import javax.inject.Inject;
 import javax.servlet.ServletException;
@@ -50,7 +51,7 @@ public class UIServlet extends HttpServlet {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Inject
-    private UIConfiguration config;
+    private Instance<UIConfiguration> config;
 
     private final FileTypeMap typeMap = MimetypesFileTypeMap
             .getDefaultFileTypeMap();
@@ -59,11 +60,19 @@ public class UIServlet extends HttpServlet {
     protected void service(final HttpServletRequest request,
             final HttpServletResponse response) throws ServletException,
             IOException {
+
+        UIConfiguration uiConfig = null;
+
         if (config == null) {
-            config = CDI.current().select(UIConfiguration.class).get();
+            config = CDI.current().select(UIConfiguration.class);
         }
 
-        if ( !config.isEnabled() )
+        if ( !config.isUnsatisfied() )
+        {
+            uiConfig = config.get();
+        }
+
+        if ( uiConfig == null || !uiConfig.isEnabled() )
         {
             logger.debug("UI is disabled; sending 404");
             response.setStatus(ApplicationStatus.NOT_FOUND.code());
@@ -109,7 +118,7 @@ public class UIServlet extends HttpServlet {
                 return;
             }
 
-            final File uiDir = config.getUIDir();
+            final File uiDir = uiConfig.getUIDir();
             logger.debug("UI basedir: '{}'", uiDir);
 
             final File resource = new File(uiDir, path);

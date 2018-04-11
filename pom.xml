@@ -22,7 +22,7 @@
   <parent>
     <groupId>org.commonjava</groupId>
     <artifactId>commonjava</artifactId>
-    <version>12</version>
+    <version>13-SNAPSHOT</version>
   </parent>
 
   <groupId>org.commonjava.propulsor</groupId>
@@ -37,14 +37,16 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <jhttpcVersion>1.6</jhttpcVersion>
+    <httpTestserverVersion>1.3</httpTestserverVersion>
 
     <resteasyVersion>3.1.4.Final</resteasyVersion>
-    <undertowVersion>1.4.16.Final</undertowVersion>
+    <undertowVersion>1.4.22.Final</undertowVersion>
     <jacksonVersion>2.9.0</jacksonVersion>
     <weldVersion>2.4.4.Final</weldVersion>
     <swaggerVersion>1.5.16</swaggerVersion>
     <logbackVersion>1.2.3</logbackVersion>
     <slf4jVersion>1.7.25</slf4jVersion>
+    <metricsVersion>3.1.0</metricsVersion>
 
     <javaVersion>1.8</javaVersion>
     <maven.compiler.source>${javaVersion}</maven.compiler.source>
@@ -89,26 +91,53 @@
         <artifactId>propulsor-resteasy</artifactId>
         <version>1.3-SNAPSHOT</version>
       </dependency>
+
       <dependency>
-        <groupId>org.commonjava.propulsor</groupId>
-        <artifactId>propulsor-camel</artifactId>
+        <groupId>org.commonjava.propulsor.camel</groupId>
+        <artifactId>propulsor-camel-core</artifactId>
         <version>1.3-SNAPSHOT</version>
       </dependency>
       <dependency>
-        <groupId>org.commonjava.propulsor</groupId>
+        <groupId>org.commonjava.propulsor.camel</groupId>
         <artifactId>propulsor-camel-activemq-embedded</artifactId>
         <version>1.3-SNAPSHOT</version>
       </dependency>
 
       <dependency>
-        <groupId>org.commonjava.util</groupId>
-        <artifactId>configuration-api</artifactId>
-        <version>0.8</version>
+        <groupId>org.commonjava.propulsor.metrics</groupId>
+        <artifactId>propulsor-metrics-core</artifactId>
+        <version>1.3-SNAPSHOT</version>
       </dependency>
       <dependency>
-        <groupId>org.commonjava.util</groupId>
-        <artifactId>configuration-dotconf</artifactId>
-        <version>0.8</version>
+        <groupId>org.commonjava.propulsor.metrics</groupId>
+        <artifactId>propulsor-metrics-reporter-zabbix</artifactId>
+        <version>1.3-SNAPSHOT</version>
+      </dependency>
+      <dependency>
+        <groupId>org.commonjava.propulsor.metrics</groupId>
+        <artifactId>propulsor-metrics-reporter-graphite</artifactId>
+        <version>1.3-SNAPSHOT</version>
+      </dependency>
+      <dependency>
+        <groupId>org.commonjava.propulsor.metrics</groupId>
+        <artifactId>propulsor-metrics-reporter-elasticsearch</artifactId>
+        <version>1.3-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.commonjava.propulsor.config</groupId>
+        <artifactId>propulsor-configuration-core</artifactId>
+        <version>1.3-SNAPSHOT</version>
+      </dependency>
+      <dependency>
+        <groupId>org.commonjava.propulsor.config</groupId>
+        <artifactId>propulsor-configuration-dotconf</artifactId>
+        <version>1.3-SNAPSHOT</version>
+      </dependency>
+      <dependency>
+        <groupId>org.commonjava.propulsor.config</groupId>
+        <artifactId>propulsor-configuration-yaml</artifactId>
+        <version>1.3-SNAPSHOT</version>
       </dependency>
 
       <dependency>
@@ -200,16 +229,21 @@
         <artifactId>args4j</artifactId>
         <version>2.33</version>
       </dependency>
-      <dependency>
-        <groupId>org.apache.xbean</groupId>
-        <artifactId>xbean-reflect</artifactId>
-        <version>3.16</version>
-      </dependency>
+
+      <!-- START: Configuration support -->
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-interpolation</artifactId>
         <version>1.19</version>
       </dependency>
+      <!-- END: Configuration support -->
+
+      <dependency>
+        <groupId>org.elasticsearch</groupId>
+        <artifactId>metrics-elasticsearch-reporter</artifactId>
+        <version>2.2.0</version>
+      </dependency>
+
       <dependency>
         <groupId>org.jboss.weld</groupId>
         <artifactId>weld-api</artifactId>
@@ -278,6 +312,12 @@
         <version>1.3</version>
         <scope>test</scope>
       </dependency>
+      <dependency>
+        <groupId>org.commonjava.util</groupId>
+        <artifactId>http-testserver</artifactId>
+        <version>${httpTestserverVersion}</version>
+        <scope>test</scope>
+      </dependency>
 
     </dependencies>
   </dependencyManagement>
@@ -343,6 +383,7 @@
     <module>undertow</module>
     <module>clients</module>
     <module>camel</module>
-    <module>camel-activemq-embedded</module>
+    <module>metrics</module>
+    <module>configuration</module>
   </modules>
 </project>

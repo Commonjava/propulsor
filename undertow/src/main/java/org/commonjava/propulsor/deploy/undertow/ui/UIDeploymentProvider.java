@@ -21,6 +21,7 @@ import io.undertow.servlet.util.ImmediateInstanceFactory;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Alternative;
+import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -34,6 +35,9 @@ public class UIDeploymentProvider
     @Inject
     private UIServlet servlet;
 
+    @Inject
+    private Instance<UIConfiguration> config;
+
     public UIDeploymentProvider() {}
 
     public UIDeploymentProvider( UIServlet servlet )
@@ -44,17 +48,24 @@ public class UIDeploymentProvider
     @Override
     public DeploymentInfo getDeploymentInfo()
     {
-        ServletInfo si = new ServletInfo( "ui-servlet", UIServlet.class ).setLoadOnStartup( 99 )
-                                                                         .addMapping( "/*.html" )
-                                                                         .addMapping( "/" )
-                                                                         .addMapping( "/js/*" )
-                                                                         .addMapping( "/css/*" )
-                                                                         .addMapping( "/partials/*" )
-                                                                         .addMapping( "/ui-addons/*" );
+        if ( !config.isUnsatisfied() && config.get().isEnabled() )
+        {
+            ServletInfo si = new ServletInfo( "ui-servlet", UIServlet.class ).setLoadOnStartup( 99 )
+                                                                             .addMapping( "/*.html" )
+                                                                             .addMapping( "/" )
+                                                                             .addMapping( "/js/*" )
+                                                                             .addMapping( "/css/*" )
+                                                                             .addMapping( "/partials/*" )
+                                                                             .addMapping( "/ui-addons/*" );
 
-        si.setInstanceFactory( new ImmediateInstanceFactory<UIServlet>( servlet ) );
+            si.setInstanceFactory( new ImmediateInstanceFactory<UIServlet>( servlet ) );
 
-        return new DeploymentInfo().addServlet( si );
+            return new DeploymentInfo().addServlet( si );
+        }
+        else
+        {
+            return new DeploymentInfo();
+        }
     }
 
 }

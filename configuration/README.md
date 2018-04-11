@@ -1,0 +1,4 @@
+Unified Configuration APIs
+==========================
+
+This is a set of projects designed to allow multiple independent subsystems of an application to share a common, application-wide configuration file. Currently, only the .conf (.ini) file format is supported. However, this support does provide both a parser for java.util.Map<String, String> configurations as well as a parser that will construct a simple bean based on the parameters it encounters. CDI is used to inject the configuration parser (along with its embedded section parser-dispatcher, etc.) into a configuration component, in order to expose the parsed configuration to the rest of an application.

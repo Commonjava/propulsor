@@ -16,12 +16,14 @@
 package org.commonjava.propulsor.deploy.undertow;
 
 import io.undertow.Undertow;
+import io.undertow.server.HttpHandler;
 import io.undertow.servlet.Servlets;
 import io.undertow.servlet.api.DeploymentInfo;
 import io.undertow.servlet.api.DeploymentManager;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
@@ -50,6 +52,9 @@ public class UndertowDeployer
 
     @Inject
     private Instance<UndertowDeploymentDefaultsProvider> defaultsDeployerInstance;
+
+    @Inject
+    private Instance<UndertowHandlerChain> handlerChain;
 
     private Set<UndertowDeploymentProvider> deploymentProviders;
 
@@ -133,14 +138,14 @@ public class UndertowDeployer
             {
                 System.out.println("Looking for open port...");
 
-                final ThreadLocal<ServletException> errorHolder = new ThreadLocal<>();
+                final AtomicReference<ServletException> errorHolder = new AtomicReference<>();
                 server = PortFinder.findPortFor( 16, ( foundPort ) -> {
                     Undertow undertow = null;
                     try
                     {
                         usingPort.set( foundPort );
                         undertow = Undertow.builder()
-                                           .setHandler( dm.start() )
+                                           .setHandler( getHandler( dm ) )
                                            .addHttpListener( foundPort, bootOptions.getBind() )
                                            .build();
 
@@ -166,7 +171,7 @@ public class UndertowDeployer
             {
                 usingPort.set( port );
                 server = Undertow.builder()
-                                 .setHandler( dm.start() )
+                                 .setHandler( getHandler( dm ) )
                                  .addHttpListener( port, bootOptions.getBind() )
                                  .build();
 
@@ -185,6 +190,19 @@ public class UndertowDeployer
         }
 
         return status;
+    }
+
+    private HttpHandler getHandler( final DeploymentManager dm )
+            throws ServletException
+    {
+        HttpHandler base = dm.start();
+
+        if ( !handlerChain.isUnsatisfied() )
+        {
+            return handlerChain.get().getHandler( base );
+        }
+
+        return base;
     }
 
     @Override

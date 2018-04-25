@@ -27,6 +27,8 @@ public class BootStatus {
 
     public static final int ERR_LOAD_CONFIG = 5;
 
+    public static final int ERR_CANT_INIT_BOOTER = 6;
+
     private Throwable error;
 
     private int exit;

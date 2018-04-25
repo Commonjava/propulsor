@@ -72,6 +72,20 @@ public abstract class BootOptions
     {
     }
 
+    public final void copyFrom( final BootOptions options )
+    {
+        this.help = options.help;
+        this.config = options.config;
+        this.interp = options.interp;
+        this.bootProps = options.bootProps;
+
+    }
+
+    protected void doCopy( final BootOptions options )
+    {
+        // NOP.
+    }
+
     public void load( final File bootDefaults, final String home )
             throws IOException, InterpolationException
     {

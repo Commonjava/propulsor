@@ -27,11 +27,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.enterprise.inject.Instance;
+import javax.enterprise.inject.spi.BeanManager;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ServiceLoader;
 
 import static org.commonjava.propulsor.boot.BootOptions.BOOT_DEFAULTS_PROP;
+import static org.commonjava.propulsor.boot.BootStatus.ERR_CANT_INIT_BOOTER;
 import static org.commonjava.propulsor.boot.BootStatus.ERR_LOAD_CONFIG;
 import static org.commonjava.propulsor.boot.BootStatus.ERR_LOAD_FROM_SYSPROPS;
 import static org.commonjava.propulsor.boot.BootStatus.ERR_PARSE_ARGS;
@@ -41,6 +44,27 @@ public class Booter
 {
     public static void main( final String[] args )
     {
+        Thread.currentThread()
+              .setUncaughtExceptionHandler( (thread,error) ->
+                  {
+                      if ( error instanceof InvocationTargetException )
+                      {
+                          final InvocationTargetException ite = (InvocationTargetException) error;
+                          System.err.println( "In: " + thread.getName() + "(" + thread.getId()
+                                                      + "), caught InvocationTargetException:" );
+                          ite.getTargetException()
+                             .printStackTrace();
+
+                          System.err.println( "...via:" );
+                          error.printStackTrace();
+                      }
+                      else
+                      {
+                          System.err.println( "In: " + thread.getName() + "(" + thread.getId() + ") Uncaught error:" );
+                          error.printStackTrace();
+                      }
+                  } );
+
         BootOptions options = null;
         try
         {
@@ -142,7 +166,7 @@ public class Booter
 
     private AppLifecycleManager lifecycleManager;
 
-    private void initialize( final BootOptions options )
+    public BootStatus initialize( final BootOptions options )
             throws BootException
     {
         this.options = options;
@@ -153,11 +177,23 @@ public class Booter
 
             weld = new Weld();
             container = weld.initialize();
+
+            // injectable version.
+            final BootOptions cdiOptions = container.instance()
+                                                        .select( BootOptions.class )
+                                                        .get();
+            cdiOptions.copyFrom( options );
+
+            final BeanManager bmgr = container.getBeanManager();
+            logger.info( "\n\n\nStarted BeanManager: {}\n\n\n", bmgr );
         }
         catch ( final RuntimeException e )
         {
-            throw new BootException( "Failed to initialize Booter: " + e.getMessage(), e );
+            logger.error( "Failed to initialize Booter: " + e.getMessage(), e );
+            status = new BootStatus( ERR_CANT_INIT_BOOTER, e );
         }
+
+        return status;
     }
 
     public BootStatus runAndWait( final BootOptions bootOptions )
@@ -226,10 +262,15 @@ public class Booter
     public BootStatus start( final BootOptions bootOptions )
             throws BootException
     {
-        initialize( bootOptions );
+        BootStatus status = initialize( bootOptions );
+        if ( status != null )
+        {
+            return status;
+        }
+
         logger.info( "Booter running: " + this );
 
-        BootStatus status = configure();
+        configure();
         if ( status != null )
         {
             return status;
@@ -263,8 +304,10 @@ public class Booter
         }
         catch ( final ConfiguratorException e )
         {
-            return new BootStatus( ERR_LOAD_CONFIG, e );
+            status = new BootStatus( ERR_LOAD_CONFIG, e );
         }
+
+        return status;
     }
 
     public void startLifecycle()

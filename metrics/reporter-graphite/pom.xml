@@ -34,12 +34,21 @@
     </dependency>
 
     <dependency>
+      <groupId>org.commonjava.propulsor.config</groupId>
+      <artifactId>propulsor-configuration-core</artifactId>
+    </dependency>
+
+    <dependency>
       <groupId>io.dropwizard.metrics</groupId>
       <artifactId>metrics-core</artifactId>
     </dependency>
     <dependency>
       <groupId>io.dropwizard.metrics</groupId>
       <artifactId>metrics-graphite</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.dropwizard.metrics</groupId>
+      <artifactId>metrics-healthchecks</artifactId>
     </dependency>
   </dependencies>
 </project>

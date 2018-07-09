@@ -46,7 +46,7 @@
     <swaggerVersion>1.5.16</swaggerVersion>
     <logbackVersion>1.2.3</logbackVersion>
     <slf4jVersion>1.7.25</slf4jVersion>
-    <metricsVersion>3.1.0</metricsVersion>
+    <metricsVersion>4.0.2</metricsVersion>
 
     <javaVersion>1.8</javaVersion>
     <maven.compiler.source>${javaVersion}</maven.compiler.source>
@@ -149,6 +149,11 @@
         <groupId>commons-lang</groupId>
         <artifactId>commons-lang</artifactId>
         <version>2.6</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-lang3</artifactId>
+        <version>3.7</version>
       </dependency>
 
       <!-- START: JAX-RS support -->

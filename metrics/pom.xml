@@ -29,7 +29,7 @@
   <artifactId>propulsor-metrics</artifactId>
   <packaging>pom</packaging>
 
-  <name>Propulsor Dropwizars.io Metrics Support</name>
+  <name>Propulsor :: Metrics Parent</name>
 
   <dependencyManagement>
     <dependencies>

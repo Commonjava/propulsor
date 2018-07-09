@@ -27,6 +27,8 @@
 
   <artifactId>propulsor-metrics-reporter-graphite</artifactId>
 
+  <name>Propulsor :: Metrics Reporter :: Graphite</name>
+
   <dependencies>
     <dependency>
       <groupId>org.commonjava.propulsor.metrics</groupId>

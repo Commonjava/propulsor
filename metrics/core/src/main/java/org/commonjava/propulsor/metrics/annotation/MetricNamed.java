@@ -13,20 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.commonjava.propulsor.metrics;
+package org.commonjava.propulsor.metrics.annotation;
 
-import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
-/**
- * Created by xiabai on 3/30/17.
- */
-@Target( { ElementType.FIELD} )
+@Target( { METHOD, TYPE } )
 @Retention( RUNTIME )
-public @interface MetricsNamed
+public @interface MetricNamed
 {
-    String value() default "";
+    String DEFAULT = "default";
+
+    String value() default DEFAULT;
 }

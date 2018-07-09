@@ -33,8 +33,6 @@ import javax.inject.Inject;
 import java.io.IOException;
 
 /**
- * Created by xiabai on 2/27/17.
- *
  * Manager class that it responsible for orchestrating initialization of the metrics / health check registries.
  */
 @ApplicationScoped
@@ -66,11 +64,11 @@ public class MetricsManager
     {
         if ( !config.isEnabled() )
         {
-            logger.debug( "Metrics subsystem is disabled." );
+            logger.info( "Indy metrics subsystem not enabled" );
             return;
         }
 
-        logger.debug( "Starting metrics subsystem..." );
+        logger.info( "Init metrics subsystem..." );
 
         if ( healthChecks != null )
         {
@@ -103,16 +101,13 @@ public class MetricsManager
         }
     }
 
-    public Timer getTimer( MetricNamed named )
+    public Timer getTimer( String name )
     {
-        logger.info( "call in IndyMetricsManager.getTimer from registry: {}", metricRegistry );
-        return this.metricRegistry.timer( named.name() );
+        return this.metricRegistry.timer( name );
     }
 
-    public Meter getMeter( MetricNamed named )
+    public Meter getMeter( String name )
     {
-        logger.info( "call in IndyMetricsManager.getMeter from registry: {}", metricRegistry );
-        return metricRegistry.meter( named.name() );
+        return metricRegistry.meter( name );
     }
-
 }

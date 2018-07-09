@@ -13,20 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.commonjava.propulsor.metrics.conf.annotation;
+package org.commonjava.propulsor.metrics.annotation;
 
-import java.lang.annotation.ElementType;
+import javax.enterprise.util.Nonbinding;
+import javax.interceptor.InterceptorBinding;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
-/**
- * Created by xiabai on 3/30/17.
- */
-@Target( { ElementType.FIELD} )
+@InterceptorBinding
+@Target( { METHOD, TYPE } )
 @Retention( RUNTIME )
-public @interface IndyMetricsNamed
+public @interface Measure
 {
-    String value() default "";
+    @Nonbinding MetricNamed[] meters() default {};
+
+    @Nonbinding MetricNamed[] timers() default {};
+
+    @Nonbinding MetricNamed[] guages() default {};
+
+    @Nonbinding MetricNamed[] counters() default {};
+
+    @Nonbinding MetricNamed[] hisograms() default {};
+
+    @Nonbinding MetricNamed[] exceptions() default {};
 }

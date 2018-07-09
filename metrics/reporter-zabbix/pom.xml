@@ -27,6 +27,8 @@
 
   <artifactId>propulsor-metrics-reporter-zabbix</artifactId>
 
+  <name>Propulsor :: Metrics Reporter :: Zabbix</name>
+
   <dependencies>
     <dependency>
       <groupId>org.commonjava.propulsor.metrics</groupId>

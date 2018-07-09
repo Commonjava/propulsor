@@ -27,6 +27,8 @@
 
   <artifactId>propulsor-metrics-reporter-elasticsearch</artifactId>
 
+  <name>Propulsor :: Metrics Reporter :: Elasticsearch</name>
+
   <dependencies>
     <dependency>
       <groupId>org.commonjava.propulsor.metrics</groupId>

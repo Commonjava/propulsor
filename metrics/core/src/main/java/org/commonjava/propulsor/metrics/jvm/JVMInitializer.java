@@ -39,7 +39,7 @@ import static org.commonjava.propulsor.metrics.InitializerUtil.registerIfEnabled
 @ApplicationScoped
 @Named
 public class JVMInitializer
-        implements MetricsInitializer
+                implements MetricsInitializer
 {
     private static final String METRIC_JVM_MEMORY = "jvm.memory";
 
@@ -69,7 +69,7 @@ public class JVMInitializer
         registerIfEnabled( METRIC_JVM_THREADS, new ThreadStatesGaugeSet(), config, registry );
         registerIfEnabled( METRIC_JVM_FILES, new FileDescriptorRatioGauge(), config, registry );
         registerIfEnabled( METRIC_JVM_CLASSLOADING, new ClassLoadingGaugeSet(), config, registry );
-        registerIfEnabled( METRIC_JVM_BUFFERS,
-                                 new BufferPoolMetricSet( ManagementFactory.getPlatformMBeanServer() ), config, registry );
+        registerIfEnabled( METRIC_JVM_BUFFERS, new BufferPoolMetricSet( ManagementFactory.getPlatformMBeanServer() ),
+                           config, registry );
     }
 }

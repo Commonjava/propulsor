@@ -17,12 +17,15 @@ package org.commonjava.propulsor.metrics.healthcheck;
 
 import com.codahale.metrics.health.HealthCheck;
 
-/**
- * Created by xiabai on 3/10/17.
- */
+import static org.apache.commons.lang3.ClassUtils.getAbbreviatedName;
+
 public abstract class ManagedHealthCheck
                 extends HealthCheck
 {
 
-    public abstract String getName();
+    public String getName()
+    {
+        return getAbbreviatedName( this.getClass().getName(), 1 );
+    }
+
 }

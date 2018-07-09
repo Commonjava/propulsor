@@ -26,7 +26,7 @@
 
   <artifactId>propulsor-configuration-dotconf</artifactId>
   
-  <name>Propulsor :: Consolidated Configuration :: .conf Format</name>
+  <name>Propulsor :: Consolidated Configuration .conf Format</name>
   
   <dependencies>
     <dependency>

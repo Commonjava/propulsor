@@ -209,6 +209,11 @@
         <artifactId>jackson-jaxrs-json-provider</artifactId>
         <version>${jacksonVersion}</version>
       </dependency>
+      <dependency>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-annotations</artifactId>
+        <version>${jacksonVersion}</version>
+      </dependency>
       <!-- END: JAX-RS support -->
       
       <dependency>

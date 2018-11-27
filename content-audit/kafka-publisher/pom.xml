@@ -27,6 +27,11 @@
 
   <dependencies>
     <dependency>
+      <groupId>org.commonjava.propulsor.config</groupId>
+      <artifactId>propulsor-configuration-core</artifactId>
+    </dependency>
+
+    <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-core</artifactId>
     </dependency>

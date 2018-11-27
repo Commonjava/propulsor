@@ -14,15 +14,22 @@
  * limitations under the License.
  */
 
-package org.commonjava.propulsor;
+package org.commonjava.propulsor.conf;
 
-/**
- * This interface provides methods to handle the result from kafka publisher
- */
-@FunctionalInterface
-public interface ResultHandler
+import org.commonjava.propulsor.config.annotation.SectionName;
+import org.commonjava.propulsor.config.section.PropertiesSectionListener;
+
+import javax.enterprise.context.ApplicationScoped;
+
+@ApplicationScoped
+@SectionName("publisher.kafka")
+public class KafkaPublisherConfig extends PropertiesSectionListener
 {
 
-    void handle( String key, String value, Exception e );
+    private String topic;
+
+    public String getTopic() { return topic; }
+
+    public void setTopic( String topic ) { this.topic = topic; }
 
 }

@@ -18,25 +18,21 @@ package org.commonjava.propulsor;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.commons.io.IOUtils;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
-import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
+import org.commonjava.propulsor.conf.KafkaPublisherConfig;
 import org.commonjava.propulsor.content.audit.FileEventPublisher;
 import org.commonjava.propulsor.content.audit.FileEventPublisherException;
 import org.commonjava.propulsor.content.audit.model.FileEvent;
 import org.commonjava.propulsor.content.audit.model.FileGroupingEvent;
 
-import java.io.File;
-import java.io.FileInputStream;
+import javax.inject.Inject;
 import java.util.Properties;
 
 public class KafkaPublisher
                 implements FileEventPublisher
 {
-
-    private static final String PROP_PATH = "publisher.properties";
 
     private String topic;
 
@@ -46,37 +42,19 @@ public class KafkaPublisher
 
     private Producer<String, String> producer;
 
-    public KafkaPublisher( String bootStrapServers, String topic, ResultHandler handler )
+    private ObjectMapper mapper;
+
+    @Inject
+    public KafkaPublisher( KafkaPublisherConfig config, ObjectMapper mapper, ResultHandler handler )
     {
-        this.topic = topic;
+        props = config.getConfiguration();
+        topic = config.getTopic();
+
+        this.mapper = mapper;
         this.handler = handler;
-
-        initProperties( bootStrapServers );
-
-        producer = new KafkaProducer<>( props );
     }
 
-    private void initProperties( String bootStrapServers )
-    {
-        props = new Properties();
-
-        FileInputStream fis = null;
-        try
-        {
-            fis = new FileInputStream( new File( PROP_PATH ) );
-            props.load( fis );
-        }
-        catch ( Exception e )
-        {
-            throw new FileEventPublisherException( "Load configuration failed.", e );
-        }
-        finally
-        {
-            IOUtils.closeQuietly( fis );
-        }
-
-        props.put( ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootStrapServers );
-    }
+    public void start() { producer = new KafkaProducer<>( props ); }
 
     @Override
     public void publishFileEvent( FileEvent fileEvent ) throws FileEventPublisherException
@@ -94,7 +72,7 @@ public class KafkaPublisher
     {
         try
         {
-            return new ObjectMapper().writeValueAsString( value );
+            return mapper.writeValueAsString( value );
         }
         catch ( JsonProcessingException e )
         {

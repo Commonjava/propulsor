@@ -26,6 +26,8 @@ public class FileGroupingEvent
 {
     private UUID eventId;
 
+    private String sessionId;
+
     private List<UUID> fileEvents;
 
     private String nodeId;
@@ -49,6 +51,10 @@ public class FileGroupingEvent
     }
 
     public UUID getEventId() { return eventId; }
+
+    public String getSessionId() { return sessionId; }
+
+    public void setSessionId( String sessionId ) { this.sessionId = sessionId; }
 
     public List<UUID> getFileEvents() { return fileEvents; }
 

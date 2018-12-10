@@ -26,6 +26,8 @@ public class FileEvent
 
     private UUID eventId;
 
+    private String sessionId;
+
     private String nodeId;
 
     private String checksum;
@@ -53,6 +55,10 @@ public class FileEvent
     }
 
     public UUID getEventId() { return eventId; }
+
+    public String getSessionId() { return sessionId; }
+
+    public void setSessionId( String sessionId ) { this.sessionId = sessionId; }
 
     public String getNodeId() { return nodeId; }
 

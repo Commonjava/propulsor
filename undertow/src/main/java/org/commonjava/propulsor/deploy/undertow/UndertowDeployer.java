@@ -16,7 +16,13 @@
 package org.commonjava.propulsor.deploy.undertow;
 
 import io.undertow.Undertow;
+import io.undertow.predicate.Predicate;
+import io.undertow.predicate.Predicates;
 import io.undertow.server.HttpHandler;
+import io.undertow.server.handlers.encoding.ContentEncodingRepository;
+import io.undertow.server.handlers.encoding.DeflateEncodingProvider;
+import io.undertow.server.handlers.encoding.EncodingHandler;
+import io.undertow.server.handlers.encoding.GzipEncodingProvider;
 import io.undertow.servlet.Servlets;
 import io.undertow.servlet.api.DeploymentInfo;
 import io.undertow.servlet.api.DeploymentManager;
@@ -202,7 +208,19 @@ public class UndertowDeployer
             return handlerChain.get().getHandler( base );
         }
 
-        return base;
+        // FROM: https://stackoverflow.com/questions/28295752/compressing-undertow-server-responses#28329810
+        final Predicate sizePredicate =
+                Predicates.parse( "max-content-size[" + Long.toString( 5 * 1024 ) + "]" );
+
+        EncodingHandler eh = new EncodingHandler(
+                new ContentEncodingRepository().addEncodingHandler( "gzip", new GzipEncodingProvider(),
+                                                                    50, sizePredicate )
+                                               .addEncodingHandler( "deflate",
+                                                                    new DeflateEncodingProvider(), 51,
+                                                                    sizePredicate ) ).setNext(
+                base );
+
+        return eh;
     }
 
     @Override

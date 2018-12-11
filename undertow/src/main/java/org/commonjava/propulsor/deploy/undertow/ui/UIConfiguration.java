@@ -18,8 +18,10 @@ package org.commonjava.propulsor.deploy.undertow.ui;
 import org.commonjava.propulsor.config.annotation.ConfigName;
 import org.commonjava.propulsor.config.annotation.SectionName;
 
+import javax.enterprise.context.ApplicationScoped;
 import java.io.File;
 
+@ApplicationScoped
 @SectionName("ui")
 public class UIConfiguration {
 
@@ -45,13 +47,13 @@ public class UIConfiguration {
         this.uiDir = uiDir;
     }
 
-    public boolean isEnabled()
+    public Boolean isEnabled()
     {
         return enabled == null ? DEFAULT_ENABLED : enabled;
     }
 
     @ConfigName( "enabled" )
-    public void setEnabled( boolean enabled )
+    public void setEnabled( Boolean enabled )
     {
         this.enabled = enabled;
     }

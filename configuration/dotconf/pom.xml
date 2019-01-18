@@ -21,7 +21,7 @@
   <parent>
     <groupId>org.commonjava.propulsor.config</groupId>
     <artifactId>propulsor-configuration</artifactId>
-    <version>1.3-SNAPSHOT</version>
+    <version>1.3</version>
   </parent>
 
   <artifactId>propulsor-configuration-dotconf</artifactId>

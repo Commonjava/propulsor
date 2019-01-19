@@ -21,7 +21,7 @@
   <parent>
     <groupId>org.commonjava.propulsor.content-audit</groupId>
     <artifactId>propulsor-content-audit</artifactId>
-    <version>1.3-SNAPSHOT</version>
+    <version>1.3</version>
   </parent>
 
   <artifactId>propulsor-content-audit-api</artifactId>

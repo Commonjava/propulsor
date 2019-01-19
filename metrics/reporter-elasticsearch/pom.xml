@@ -22,7 +22,7 @@
   <parent>
     <groupId>org.commonjava.propulsor.metrics</groupId>
     <artifactId>propulsor-metrics</artifactId>
-    <version>1.3-SNAPSHOT</version>
+    <version>1.3</version>
   </parent>
 
   <artifactId>propulsor-metrics-reporter-elasticsearch</artifactId>

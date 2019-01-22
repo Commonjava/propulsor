@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2018 Red Hat, Inc. (https://github.com/Commonjava/propulsor)
+ * Copyright (C) 2015 John Casey (jdcasey@commonjava.org)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.

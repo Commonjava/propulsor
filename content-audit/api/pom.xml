@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--
 
-    Copyright (C) 2011-2018 Red Hat, Inc. (https://github.com/Commonjava/propulsor)
+    Copyright (C) 2015 John Casey (jdcasey@commonjava.org)
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@
   <parent>
     <groupId>org.commonjava.propulsor.content-audit</groupId>
     <artifactId>propulsor-content-audit</artifactId>
-    <version>1.3-SNAPSHOT</version>
+    <version>1.4-SNAPSHOT</version>
   </parent>
 
   <artifactId>propulsor-content-audit-api</artifactId>

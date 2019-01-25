@@ -15,9 +15,9 @@
  */
 package org.commonjava.propulsor.boot;
 
-import org.codehaus.plexus.interpolation.InterpolationException;
 import org.commonjava.propulsor.config.Configurator;
 import org.commonjava.propulsor.config.ConfiguratorException;
+import org.commonjava.propulsor.deploy.DeployException;
 import org.commonjava.propulsor.deploy.Deployer;
 import org.commonjava.propulsor.lifecycle.AppLifecycleException;
 import org.commonjava.propulsor.lifecycle.AppLifecycleManager;
@@ -29,87 +29,82 @@ import org.slf4j.LoggerFactory;
 import javax.enterprise.inject.Instance;
 import javax.enterprise.inject.spi.BeanManager;
 import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ServiceLoader;
 
-import static org.commonjava.propulsor.boot.BootOptions.BOOT_DEFAULTS_PROP;
-import static org.commonjava.propulsor.boot.BootStatus.ERR_CANT_INIT_BOOTER;
-import static org.commonjava.propulsor.boot.BootStatus.ERR_LOAD_CONFIG;
-import static org.commonjava.propulsor.boot.BootStatus.ERR_LOAD_FROM_SYSPROPS;
+import static org.commonjava.propulsor.boot.BootStatus.ERR_LOAD_BOOT_OPTIONS;
 import static org.commonjava.propulsor.boot.BootStatus.ERR_PARSE_ARGS;
-import static org.commonjava.propulsor.boot.BootStatus.ERR_STARTING;
+import static org.commonjava.propulsor.boot.BootStatus.ERR_START;
 
 public class Booter
+                implements WeldBootInterface
 {
+    public static String BOOT_DEFAULTS_PROP = "boot.defaults";
+
     public static void main( final String[] args )
     {
-        Thread.currentThread()
-              .setUncaughtExceptionHandler( (thread,error) ->
-                  {
-                      if ( error instanceof InvocationTargetException )
-                      {
-                          final InvocationTargetException ite = (InvocationTargetException) error;
-                          System.err.println( "In: " + thread.getName() + "(" + thread.getId()
-                                                      + "), caught InvocationTargetException:" );
-                          ite.getTargetException()
-                             .printStackTrace();
-
-                          System.err.println( "...via:" );
-                          error.printStackTrace();
-                      }
-                      else
-                      {
-                          System.err.println( "In: " + thread.getName() + "(" + thread.getId() + ") Uncaught error:" );
-                          error.printStackTrace();
-                      }
-                  } );
+        setUncaughtExceptionHandler();
 
         BootOptions options = null;
         try
         {
-            options = loadBootOptions();
+            options = loadBootOptionsByServiceLoader();
         }
         catch ( final BootException e )
         {
             e.printStackTrace();
-            System.err.println( e.getMessage() );
-            System.exit( ERR_LOAD_FROM_SYSPROPS );
+            System.err.printf( "ERR LOAD BOOT OPTIONS: %s", e.getMessage() );
+            System.exit( ERR_LOAD_BOOT_OPTIONS );
         }
 
         try
         {
-            options.parseArgs( args );
+            if ( options.parseArgs( args ) )
+            {
+                try
+                {
+                    Booter booter = new Booter();
+                    booter.runAndWait( options );
+                }
+                catch ( final BootException e )
+                {
+                    e.printStackTrace();
+                    System.err.printf( "ERR START: %s", e.getMessage() );
+                    System.exit( ERR_START );
+                }
+            }
         }
         catch ( final BootException e )
         {
             e.printStackTrace();
-            System.err.println( e.getMessage() );
+            System.err.printf( "ERR PARSE ARGS: %s", e.getMessage() );
             System.exit( ERR_PARSE_ARGS );
-        }
-
-        BootStatus status = null;
-        try
-        {
-            status = new Booter().runAndWait( options );
-        }
-        catch ( final BootException e )
-        {
-            e.printStackTrace();
-            System.err.println( e.getMessage() );
-            System.exit( ERR_STARTING );
-        }
-
-        if ( status.isFailed() )
-        {
-            status.getError().printStackTrace();
-            System.err.println( status.getError().getMessage() );
-            System.exit( status.getExitCode() );
         }
     }
 
-    private static BootOptions loadBootOptions()
-            throws BootException
+    public static BootOptions loadFromSysProps( String name, String bootDefaultProp, String homeProp )
+                    throws BootException
+    {
+        final String bootDef = System.getProperty( bootDefaultProp );
+        File bootDefaults = null;
+        if ( bootDef != null )
+        {
+            bootDefaults = new File( bootDef );
+        }
+
+        try
+        {
+            final String indyHome = System.getProperty( homeProp, new File( "." ).getCanonicalPath() );
+            return new BootOptions( name, indyHome, bootDefaults );
+        }
+        catch ( final Exception e )
+        {
+            throw new BootException( "ERROR LOADING BOOT DEFAULTS: %s.\nReason: %s\n\n", e, bootDefaults,
+                                     e.getMessage() );
+        }
+    }
+
+    public static BootOptions loadBootOptionsByServiceLoader() throws BootException
     {
         final String bootDef = System.getProperty( BOOT_DEFAULTS_PROP );
         File bootDefaults = null;
@@ -123,120 +118,114 @@ public class Booter
 
         try
         {
-            String home = System.getProperty( options.getHomeSystemProperty() );
-
+            String home = System.getenv( options.getHomeEnvar() );
             if ( home == null )
             {
-                home = System.getenv( options.getHomeEnvar() );
+                home = System.getProperty( options.getHomeSystemProperty(), new File( "." ).getCanonicalPath() );
             }
+            options.setHomeDir( home );
 
-            if ( home == null )
-            {
-                home = new File( "." ).getCanonicalPath();
-            }
-
-            options.load( bootDefaults, home );
+            options.load( bootDefaults );
             return options;
         }
-        catch ( final IOException e )
+        catch ( final Exception e )
         {
             throw new BootException( "ERROR LOADING BOOT DEFAULTS: %s.\nReason: %s\n\n", e, bootDefaults,
                                      e.getMessage() );
         }
-        catch ( final InterpolationException e )
-        {
-            throw new BootException( "ERROR RESOLVING BOOT DEFAULTS: %s.\nReason: %s\n\n", e, bootDefaults,
-                                     e.getMessage() );
-        }
+    }
+
+    public static void setUncaughtExceptionHandler()
+    {
+        Thread.currentThread().setUncaughtExceptionHandler( ( thread, error ) -> {
+            if ( error instanceof InvocationTargetException )
+            {
+                final InvocationTargetException ite = (InvocationTargetException) error;
+                System.err.println( "In: " + thread.getName() + "(" + thread.getId()
+                                                    + "), caught InvocationTargetException:" );
+                ite.getTargetException().printStackTrace();
+
+                System.err.println( "...via:" );
+                error.printStackTrace();
+            }
+            else
+            {
+                System.err.println( "In: " + thread.getName() + "(" + thread.getId() + ") Uncaught error:" );
+                error.printStackTrace();
+            }
+        } );
     }
 
     private final Logger logger = LoggerFactory.getLogger( getClass() );
 
-    private BootStatus status;
+    protected BootStatus status;
 
-    private BootOptions options;
+    protected BootOptions options;
 
-    private Weld weld;
+    protected Weld weld;
 
-    private WeldContainer container;
+    protected WeldContainer container;
 
-    private Deployer deployer;
+    protected Deployer deployer;
 
-    private Configurator configurator;
+    protected Configurator configurator;
 
-    private AppLifecycleManager lifecycleManager;
+    protected AppLifecycleManager lifecycleManager;
 
-    public BootStatus initialize( final BootOptions options )
-            throws BootException
+    @Override
+    public void initialize( final BootOptions options ) throws BootException
     {
         this.options = options;
+        this.options.setSystemProperties();
 
-        try
+        weld = new Weld();
+        weld.property( "org.jboss.weld.se.archive.isolation", false );
+
+        // Weld shutdown hook might disturb application shutdown hooks. We need to disable it.
+        weld.skipShutdownHook();
+
+        container = weld.initialize();
+
+        // injectable version.
+        final BootOptions cdiOptions = container.select( BootOptions.class ).get();
+        if ( cdiOptions != null )
         {
-            options.setSystemProperties();
-
-            weld = new Weld();
-            container = weld.initialize();
-
-            // injectable version.
-            final BootOptions cdiOptions = container.instance()
-                                                        .select( BootOptions.class )
-                                                        .get();
             cdiOptions.copyFrom( options );
-
-            final BeanManager bmgr = container.getBeanManager();
-            logger.info( "\n\n\nStarted BeanManager: {}\n\n\n", bmgr );
-        }
-        catch ( final RuntimeException e )
-        {
-            logger.error( "Failed to initialize Booter: " + e.getMessage(), e );
-            status = new BootStatus( ERR_CANT_INIT_BOOTER, e );
         }
 
-        return status;
+        final BeanManager bmgr = container.getBeanManager();
+        logger.info( "\n\n\nStarted BeanManager: {}\n\n\n", bmgr );
     }
 
-    public BootStatus runAndWait( final BootOptions bootOptions )
-            throws BootException
+    @Override
+    public void runAndWait( final BootOptions bootOptions ) throws BootException
     {
-        status = start( bootOptions );
-        if ( !status.isSuccess() )
-        {
-            return status;
-        }
+        start( bootOptions );
+        addNotifyShutDownHook();
 
-        logger.info( "Setting up shutdown hook..." );
-        lifecycleManager.installShutdownHook();
-
-        synchronized ( deployer )
+        logger.info( "Start waiting on {}", this );
+        synchronized ( this )
         {
             try
             {
-                deployer.wait();
+                wait();
             }
             catch ( final InterruptedException e )
             {
                 e.printStackTrace();
-                logger.info( "{} exiting", options.getApplicationName() );
+                logger.info( "{} exiting", bootOptions.getApplicationName() );
             }
         }
-
-        return status;
     }
 
-    public BootStatus run( final BootOptions bootOptions )
-            throws BootException
+    private void addNotifyShutDownHook()
     {
-        status = start( bootOptions );
-        if ( !status.isSuccess() )
-        {
-            return status;
-        }
-
-        logger.info( "Setting up shutdown hook..." );
-        lifecycleManager.installShutdownHook();
-
-        return status;
+        Runtime.getRuntime().addShutdownHook( new Thread( () -> {
+            synchronized ( this )
+            {
+                notifyAll();
+            }
+        } ) );
     }
 
     public WeldContainer getContainer()
@@ -249,97 +238,119 @@ public class Booter
         return options;
     }
 
-    public BootStatus deploy()
+    protected Deployer getDeployer()
     {
-        deployer = container.instance().select( Deployer.class ).get();
-        BootStatus status = deployer.deploy( options );
-
-        return status == null ?
-                new BootStatus( ERR_STARTING, new IllegalStateException( "Deployment failed" ) ) :
-                status;
+        return deployer;
     }
 
-    public BootStatus start( final BootOptions bootOptions )
-            throws BootException
+    protected Configurator getConfigurator()
     {
-        BootStatus status = initialize( bootOptions );
-        if ( status != null )
+        return configurator;
+    }
+
+    @Override
+    public void start( final BootOptions bootOptions ) throws BootException
+    {
+        logger.info( "Starting, bootOptions: {}", bootOptions );
+        try
         {
-            return status;
+            logger.info( "Initializing..." );
+            initialize( bootOptions );
+        }
+        catch ( final Throwable t )
+        {
+            throw new BootException( "Failed to initialize", t );
         }
 
-        logger.info( "Booter running: " + this );
-
-        configure();
-        if ( status != null )
+        logger.info( "Configuring..." );
+        try
         {
-            return status;
+            config();
+        }
+        catch ( final ConfiguratorException e )
+        {
+            throw new BootException( "Application config failed", e );
         }
 
+        logger.info( "Lifecycle..." );
         try
         {
             startLifecycle();
         }
         catch ( AppLifecycleException e )
         {
-            throw new BootException( "Application startup failed. Reason: %s", e, e.getMessage() );
+            throw new BootException( "Application startup failed", e );
         }
 
-        return deploy();
+        logger.info( "Deploying..." );
+        deploy();
+
+        logger.info( "Start complete!" );
     }
 
-    public BootStatus configure()
+    @Override
+    public void config() throws ConfiguratorException
     {
-        final Instance<Configurator> selection = container.instance().select( Configurator.class );
+        final Instance<Configurator> selection = container.select( Configurator.class );
         if ( !selection.iterator().hasNext() )
         {
-            return null;
+            logger.info( "No configurator found!" );
+            return;
         }
 
         configurator = selection.get();
-        try
-        {
-            configurator.load( options );
-            return null;
-        }
-        catch ( final ConfiguratorException e )
-        {
-            status = new BootStatus( ERR_LOAD_CONFIG, e );
-        }
+        logger.info( "Configurator: {}", configurator.getClass() );
 
-        return status;
+        configurator.load( options );
     }
 
-    public void startLifecycle()
-            throws AppLifecycleException
+    @Override
+    public void startLifecycle() throws AppLifecycleException
     {
-        final Instance<AppLifecycleManager> selection = container.instance().select( AppLifecycleManager.class );
+        final Instance<AppLifecycleManager> selection = container.select( AppLifecycleManager.class );
         if ( !selection.iterator().hasNext() )
         {
+            logger.info( "No application life cycle manager found!" );
             return;
         }
 
         lifecycleManager = selection.get();
+        logger.info( "LifecycleManager: {}", lifecycleManager.getClass() );
 
-        logger.info( "Starting up application with lifecycle manager: {}", lifecycleManager );
         lifecycleManager.startup();
+        lifecycleManager.installShutdownHook();
     }
 
-    public BootStatus stop()
+    @Override
+    public void deploy() throws DeployException
     {
-        if ( status.isSuccess() )
+        final Instance<Deployer> selection = container.select( Deployer.class );
+        if ( !selection.iterator().hasNext() )
         {
-            if ( container != null )
-            {
-                deployer.stop();
-                if ( lifecycleManager != null )
-                {
-                    lifecycleManager.stop();
-                }
-                weld.shutdown();
-            }
+            logger.info( "No deployer found!" );
+            return;
         }
+        deployer = selection.get();
+        logger.info( "Deployer: {}", deployer.getClass() );
 
-        return status;
+        deployer.deploy( options );
     }
+
+    @Override
+    public void stop()
+    {
+        if ( deployer != null )
+        {
+            deployer.stop();
+        }
+        if ( lifecycleManager != null )
+        {
+            lifecycleManager.stop();
+        }
+        if ( weld != null )
+        {
+            weld.shutdown();
+        }
+    }
+
 }

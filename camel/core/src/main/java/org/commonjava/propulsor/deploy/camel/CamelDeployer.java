@@ -18,7 +18,7 @@ package org.commonjava.propulsor.deploy.camel;
 import org.apache.camel.CamelContext;
 import org.apache.camel.main.Main;
 import org.commonjava.propulsor.boot.BootOptions;
-import org.commonjava.propulsor.boot.BootStatus;
+import org.commonjava.propulsor.deploy.DeployException;
 import org.commonjava.propulsor.deploy.Deployer;
 import org.commonjava.propulsor.deploy.camel.ctx.CamelContextualizer;
 import org.commonjava.propulsor.deploy.camel.route.RouteProvider;
@@ -38,10 +38,6 @@ import javax.inject.Inject;
 public class CamelDeployer
         implements Deployer
 {
-
-    private static final int ERR_CANT_CONTEXTUALIZE = 6;
-
-    private static final int ERR_CANT_SETUP_ROUTES = 7;
 
     private Main camelMain;
 
@@ -85,7 +81,7 @@ public class CamelDeployer
     }
 
     @Override
-    public BootStatus deploy( final BootOptions options )
+    public void deploy( final BootOptions options ) throws DeployException
     {
         camelMain = new Main();
 
@@ -99,7 +95,7 @@ public class CamelDeployer
                 }
                 catch ( AppLifecycleException e )
                 {
-                    return new BootStatus( ERR_CANT_CONTEXTUALIZE, e );
+                    throw new DeployException( "ERR_CANT_CONTEXTUALIZE", e );
                 }
             }
         }
@@ -114,7 +110,7 @@ public class CamelDeployer
                 }
                 catch ( Exception e )
                 {
-                    return new BootStatus(ERR_CANT_SETUP_ROUTES, e );
+                    throw new DeployException( "ERR_CANT_SETUP_ROUTES", e );
                 }
             }
         }
@@ -125,10 +121,8 @@ public class CamelDeployer
         }
         catch ( Exception e )
         {
-            return new BootStatus(BootStatus.ERR_STARTING, e );
+            throw new DeployException( "ERR_STARTING", e );
         }
-
-        return new BootStatus();
     }
 
 }

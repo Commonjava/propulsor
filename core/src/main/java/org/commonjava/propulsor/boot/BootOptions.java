@@ -15,7 +15,6 @@
  */
 package org.commonjava.propulsor.boot;
 
-import org.apache.commons.io.IOUtils;
 import org.codehaus.plexus.interpolation.InterpolationException;
 import org.codehaus.plexus.interpolation.PropertiesBasedValueSource;
 import org.codehaus.plexus.interpolation.StringSearchInterpolator;
@@ -30,38 +29,96 @@ import java.util.Properties;
 
 import static org.apache.commons.lang.StringUtils.isEmpty;
 
-public abstract class BootOptions
+/**
+ * BootOptions can be instantiated in
+ * 1. specify a boot file via -Dboot.properties . The entries will be loaded into an internal properties;
+ * 2. parse main's args
+ * 3. via constructor and setters
+ *
+ * BootOptions contains applicationName, homeDir (the application's home) and 4 others
+ * bind, port, config dir, context-path.
+ *
+ * The homeDir is not set in properties file. Rather, it is passed by a constructor parameter.
+ * The config is the full path of main.conf. Default is <homeDir>/etc/{application}/main.conf
+ */
+public class BootOptions
 {
 
-    public static final String BOOT_DEFAULTS_PROP = "boot.properties";
+    public static final String BIND_PROP = "bind";
+
+    public static final String PORT_PROP = "port";
+
+    public static final String CONFIG_PROP = "config";
+
+    public static final String CONTEXT_PATH_PROP = "context-path";
+
+    public static final String DEFAULT_BIND = "0.0.0.0";
+
+    public static final int DEFAULT_PORT = 8080;
 
     @Option( name = "-h", aliases = { "--help" }, usage = "Print this and exit" )
     private boolean help;
 
+    @Option( name = "-i", aliases = { "--interface", "--bind",
+                    "--listen" }, usage = "Bind to a particular IP address (default: 0.0.0.0, or all available)" )
+    private String bind;
+
+    @Option( name = "-p", aliases = { "--port" }, usage = "Use different port (default: 8080)" )
+    private Integer port;
+
+    @Option( name = "-c", aliases = {
+                    "--config" }, usage = "Use an alternative configuration file (default: <homeDir>/etc/{application}/main.conf)" )
+    private String config;
+
+    @Option( name = "-C", aliases = { "--context-path" }, usage = "Specify a root context path for all to use" )
+    private String contextPath;
+
     private StringSearchInterpolator interp;
 
-    private Properties bootProps;
+    private Properties props;
+
+    private String applicationName; // application name, e.g, "indy", used for something like default conf dir
 
     private String homeDir;
 
-    @Option( name = "-f", aliases = { "--config" }, usage = "Specify the configuration file" )
-    private String config;
+    public String getApplicationName()
+    {
+        return applicationName;
+    }
 
-    public abstract String getApplicationName();
+    public String getHomeSystemProperty()
+    {
+        return getApplicationName() + ".home"; // e.g. "indy.home"
+    }
 
-    public abstract String getHomeSystemProperty();
+    /**
+     * Environment variables are specified at the OS level.
+     */
+    public String getHomeEnvar()
+    {
+        return getHomeSystemProperty();
+    }
 
-    public abstract String getConfigSystemProperty();
+    public String getConfigSystemProperty()
+    {
+        return getApplicationName() + ".config"; // e.g., "indy.config"
+    }
 
-    public abstract String getHomeEnvar();
-
-    protected BootOptions()
+    public BootOptions()
     {
     }
 
-    protected BootOptions( final String homeDir )
+    public BootOptions( final String applicationName, final String homeDir )
     {
+        this.applicationName = applicationName;
         this.homeDir = homeDir;
+    }
+
+    public BootOptions( final String application, final String homeDir, final File bootDefaults )
+                    throws IOException, InterpolationException
+    {
+        this( application, homeDir );
+        load( bootDefaults );
     }
 
     protected void loadApplicationOptions()
@@ -74,43 +131,53 @@ public abstract class BootOptions
 
     public final void copyFrom( final BootOptions options )
     {
+        this.applicationName = options.applicationName;
         this.help = options.help;
         this.config = options.config;
         this.interp = options.interp;
-        this.bootProps = options.bootProps;
-
+        this.props = options.props;
+        this.bind = options.bind;
+        this.port = options.port;
+        this.config = options.config;
+        this.contextPath = options.contextPath;
     }
 
-    protected void doCopy( final BootOptions options )
+    public void load( final File bootDefaults ) throws IOException, InterpolationException
     {
-        // NOP.
-    }
-
-    public void load( final File bootDefaults, final String home )
-            throws IOException, InterpolationException
-    {
-        homeDir = home;
-        bootProps = new Properties();
+        this.props = new Properties();
 
         if ( bootDefaults != null && bootDefaults.exists() )
         {
-            FileInputStream stream = null;
-            try
+            try (FileInputStream stream = new FileInputStream( bootDefaults ))
             {
-                stream = new FileInputStream( bootDefaults );
-
-                bootProps.load( stream );
-            }
-            finally
-            {
-                IOUtils.closeQuietly( stream );
+                props.load( stream );
             }
         }
+
+        bind = resolve( props.getProperty( BIND_PROP, DEFAULT_BIND ) );
+        port = Integer.parseInt( resolve( props.getProperty( PORT_PROP, Integer.toString( DEFAULT_PORT ) ) ) );
+
+        String defaultConfigPath = new File( homeDir, "etc/" + getApplicationName() + "/main.conf" ).getPath();
+        config = resolve( props.getProperty( CONFIG_PROP, defaultConfigPath ) );
+        contextPath = normalizeContextPath( props.getProperty( CONTEXT_PATH_PROP, contextPath ) );
 
         loadApplicationOptions();
     }
 
-    protected final void setSystemProperties()
+    private String normalizeContextPath( String contextPath )
+    {
+        if ( contextPath == null )
+        {
+            return "";
+        }
+        else if ( contextPath.startsWith( "/" ) )
+        {
+            return contextPath.substring( 1 );
+        }
+        return contextPath;
+    }
+
+    public final void setSystemProperties()
     {
         final Properties properties = System.getProperties();
 
@@ -121,7 +188,7 @@ public abstract class BootOptions
         System.setProperties( properties );
     }
 
-    private final void setProperty( Properties properties, String key, String value )
+    private void setProperty( Properties properties, String key, String value )
     {
         if ( isEmpty( value ) )
         {
@@ -131,20 +198,14 @@ public abstract class BootOptions
         properties.setProperty( key, value );
     }
 
-    protected final Properties getBootProperties()
-    {
-        return bootProps;
-    }
-
-    protected final String resolve( final String value )
-            throws InterpolationException
+    public final String resolve( final String value ) throws InterpolationException
     {
         if ( value == null || value.trim().length() < 1 )
         {
             return null;
         }
 
-        if ( bootProps == null )
+        if ( props == null )
         {
             if ( homeDir == null )
             {
@@ -152,34 +213,22 @@ public abstract class BootOptions
             }
             else
             {
-                bootProps = new Properties();
+                props = new Properties();
             }
         }
 
-        bootProps.setProperty( getHomeSystemProperty(), homeDir );
+        props.setProperty( getHomeSystemProperty(), homeDir );
 
         if ( interp == null )
         {
             interp = new StringSearchInterpolator();
-            interp.addValueSource( new PropertiesBasedValueSource( bootProps ) );
+            interp.addValueSource( new PropertiesBasedValueSource( props ) );
         }
 
         return interp.interpolate( value );
     }
 
-    public boolean isHelp()
-    {
-        return help;
-    }
-
-    public BootOptions setHelp( final boolean help )
-    {
-        this.help = help;
-        return this;
-    }
-
-    public boolean parseArgs( final String[] args )
-            throws BootException
+    public boolean parseArgs( final String[] args ) throws BootException
     {
         final CmdLineParser parser = new CmdLineParser( this );
         boolean canStart = true;
@@ -201,44 +250,28 @@ public abstract class BootOptions
         return canStart;
     }
 
-    public static void printUsage( final CmdLineParser parser, final CmdLineException error )
+    public void printUsage( final CmdLineParser parser, final CmdLineException error )
     {
         if ( error != null )
         {
             System.err.println( "Invalid option(s): " + error.getMessage() );
             System.err.println();
         }
-
         System.err.println( "Usage: $0 [OPTIONS] [<target-path>]" );
         System.err.println();
         System.err.println();
-        // If we are running under a Linux shell COLUMNS might be available for
-        // the width
-        // of the terminal.
-        parser.setUsageWidth(
-                System.getenv( "COLUMNS" ) == null ? 100 : Integer.valueOf( System.getenv( "COLUMNS" ) ) );
         parser.printUsage( System.err );
         System.err.println();
     }
 
     public String getHomeDir()
     {
-        return homeDir == null ? System.getProperty( "user.home" ) + "/." + getHomeSystemProperty() : homeDir;
+        return homeDir == null ? System.getProperty( getHomeSystemProperty() ) : homeDir;
     }
 
-    public void setHomeDir( final String home )
+    public void setHomeDir( final String homeDir )
     {
-        homeDir = home;
-    }
-
-    protected String getSpecifiedConfig()
-    {
-        return config;
-    }
-
-    public String getConfig()
-    {
-        return config == null ? getDefaultConfigFile() : config;
+        this.homeDir = homeDir;
     }
 
     protected String getDefaultConfigFile()
@@ -246,13 +279,69 @@ public abstract class BootOptions
         return new File( getHomeDir(), "etc/main.conf" ).getPath();
     }
 
-    public void setConfig( String config )
+    public void setProps( Properties props )
+    {
+        this.props = props;
+    }
+
+    public void setPort( Integer port )
+    {
+        this.port = port;
+    }
+
+    public Properties getProps()
+    {
+        return props;
+    }
+
+    public boolean isHelp()
+    {
+        return help;
+    }
+
+    public String getBind()
+    {
+        return bind;
+    }
+
+    public int getPort()
+    {
+        return port;
+    }
+
+    public String getConfig()
+    {
+        return config == null ? getDefaultConfigFile() : config;
+    }
+
+    public void setHelp( final boolean help )
+    {
+        this.help = help;
+    }
+
+    public void setBind( final String bind )
+    {
+        this.bind = bind;
+    }
+
+    public void setPort( final int port )
+    {
+        this.port = port;
+    }
+
+    public void setConfig( final String config )
     {
         this.config = config;
     }
 
-    public void setBootProps( Properties bootProps )
+    public String getContextPath()
     {
-        this.bootProps = bootProps;
+        return contextPath;
     }
+
+    public void setContextPath( final String contextPath )
+    {
+        this.contextPath = normalizeContextPath( contextPath );
+    }
+
 }

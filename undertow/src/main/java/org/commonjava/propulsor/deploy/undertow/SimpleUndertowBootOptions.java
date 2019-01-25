@@ -67,12 +67,6 @@ public final class SimpleUndertowBootOptions
     }
 
     @Override
-    public void setPort( int port )
-    {
-        this.port = port;
-    }
-
-    @Override
     public String getApplicationName()
     {
         return appName;

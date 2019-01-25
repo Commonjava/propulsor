@@ -38,10 +38,9 @@ import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 import javax.servlet.ServletException;
 
-import org.commonjava.propulsor.boot.BootException;
 import org.commonjava.propulsor.boot.BootOptions;
-import org.commonjava.propulsor.boot.BootStatus;
 import org.commonjava.propulsor.boot.PortFinder;
+import org.commonjava.propulsor.deploy.DeployException;
 import org.commonjava.propulsor.deploy.Deployer;
 import org.commonjava.propulsor.deploy.undertow.util.DeploymentInfoUtils;
 import org.slf4j.Logger;
@@ -65,8 +64,6 @@ public class UndertowDeployer
     private Set<UndertowDeploymentProvider> deploymentProviders;
 
     private UndertowDeploymentDefaultsProvider deploymentDefaultsProvider;
-
-    private BootStatus status;
 
     private Undertow server;
 
@@ -117,7 +114,7 @@ public class UndertowDeployer
     }
 
     @Override
-    public BootStatus deploy( final BootOptions options )
+    public void deploy( final BootOptions options ) throws DeployException
     {
         UndertowBootOptions bootOptions;
         if ( options instanceof UndertowBootOptions )
@@ -135,7 +132,6 @@ public class UndertowDeployer
                                              .addDeployment( di );
         dm.deploy();
 
-        status = new BootStatus();
         ThreadLocal<Integer> usingPort = new ThreadLocal<>();
         try
         {
@@ -185,17 +181,13 @@ public class UndertowDeployer
                 server.start();
             }
 
-            status.markSuccess();
-
             System.out.printf( "%s listening on %s:%s\n\n", options.getApplicationName(), bootOptions.getBind(), bootOptions.getPort() );
 
         }
-        catch ( ServletException | RuntimeException e )
+        catch ( Exception e )
         {
-            status.markFailed( BootStatus.ERR_CANT_LISTEN, new BootException( "Failed to start on port: " + usingPort.get(), e ) );
+            throw new DeployException( "Failed to deploy", e );
         }
-
-        return status;
     }
 
     private HttpHandler getHandler( final DeploymentManager dm )
@@ -226,7 +218,7 @@ public class UndertowDeployer
     @Override
     public void stop()
     {
-        if ( server != null && status.isSuccess() )
+        if ( server != null )
         {
             server.stop();
         }

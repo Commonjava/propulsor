@@ -22,7 +22,6 @@ import org.commonjava.propulsor.boot.BootOptions;
  */
 public final class SimpleUndertowBootOptions
         extends BootOptions
-        implements UndertowBootOptions
 {
     private final String appName;
 
@@ -46,12 +45,6 @@ public final class SimpleUndertowBootOptions
     public String getContextPath()
     {
         return "/";
-    }
-
-    @Override
-    public String getDeploymentName()
-    {
-        return "Web (Undertow)";
     }
 
     @Override

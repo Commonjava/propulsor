@@ -33,7 +33,6 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.inject.Any;
 import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 import javax.servlet.ServletException;
@@ -114,19 +113,9 @@ public class UndertowDeployer
     }
 
     @Override
-    public void deploy( final BootOptions options ) throws DeployException
+    public void deploy( final BootOptions bootOptions ) throws DeployException
     {
-        UndertowBootOptions bootOptions;
-        if ( options instanceof UndertowBootOptions )
-        {
-            bootOptions = (UndertowBootOptions) options;
-        }
-        else
-        {
-            bootOptions = UndertowBootOptions.DEFAULT;
-        }
-
-        final DeploymentInfo di = getDeployment( bootOptions.getContextPath(), bootOptions.getDeploymentName() );
+        final DeploymentInfo di = getDeployment( bootOptions.getContextPath(), bootOptions.getApplicationName() );
 
         final DeploymentManager dm = Servlets.defaultContainer()
                                              .addDeployment( di );
@@ -181,7 +170,7 @@ public class UndertowDeployer
                 server.start();
             }
 
-            System.out.printf( "%s listening on %s:%s\n\n", options.getApplicationName(), bootOptions.getBind(), bootOptions.getPort() );
+            System.out.printf( "%s listening on %s:%s\n\n", bootOptions.getApplicationName(), bootOptions.getBind(), bootOptions.getPort() );
 
         }
         catch ( Exception e )

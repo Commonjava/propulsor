@@ -16,6 +16,7 @@
 package org.commonjava.propulsor.content.audit.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Date;
 import java.util.Map;
@@ -36,7 +37,7 @@ public class FileEvent
 
     private String targetPath;
 
-    private String eventType;
+    private FileEventType eventType;
 
     private String requestId;
 
@@ -47,7 +48,7 @@ public class FileEvent
     @JsonFormat( shape = JsonFormat.Shape.STRING )
     private Date timestamp;
 
-    public FileEvent( String eventType )
+    public FileEvent( @JsonProperty("eventType") FileEventType eventType )
     {
         this.eventId = UUID.randomUUID();
         this.eventVersion = 1;
@@ -76,9 +77,9 @@ public class FileEvent
 
     public void setTargetPath( String targetPath ) { this.targetPath = targetPath; }
 
-    public String getEventType() { return eventType; }
+    public FileEventType getEventType() { return eventType; }
 
-    public void setEventType( String eventType ) { this.eventType = eventType; }
+    public void setEventType( FileEventType eventType ) { this.eventType = eventType; }
 
     public String getRequestId() { return requestId; }
 

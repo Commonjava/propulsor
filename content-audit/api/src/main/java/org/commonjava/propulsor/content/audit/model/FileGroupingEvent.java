@@ -18,12 +18,13 @@ package org.commonjava.propulsor.content.audit.model;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-public class FileGroupingEvent
+public class FileGroupingEvent implements Comparable<FileGroupingEvent>, Serializable
 {
     private UUID eventId;
 
@@ -85,4 +86,9 @@ public class FileGroupingEvent
 
     public void setTimestamp( Date timestamp ) { this.timestamp = timestamp; }
 
+    @Override
+    public int compareTo( FileGroupingEvent o )
+    {
+        return getTimestamp().compareTo( o.getTimestamp() );
+    }
 }

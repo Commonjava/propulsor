@@ -24,6 +24,7 @@ import java.util.Properties;
 import javax.inject.Named;
 
 import org.codehaus.plexus.interpolation.InterpolationException;
+import org.codehaus.plexus.interpolation.Interpolator;
 import org.codehaus.plexus.interpolation.PropertiesBasedValueSource;
 import org.codehaus.plexus.interpolation.StringSearchInterpolator;
 import org.commonjava.propulsor.config.ConfigurationException;
@@ -60,6 +61,16 @@ public class SingleSectionConfigReader
 
     @Override
     public void loadConfiguration( final InputStream stream, final Properties properties )
+            throws ConfigurationException
+    {
+        final StringSearchInterpolator interpolator = new StringSearchInterpolator();
+        interpolator.addValueSource( new PropertiesBasedValueSource( properties ) );
+
+        loadConfiguration( stream, interpolator );
+    }
+
+    @Override
+    public void loadConfiguration( final InputStream stream, final Interpolator interpolator )
         throws ConfigurationException
     {
         final Properties props = new Properties();
@@ -77,16 +88,13 @@ public class SingleSectionConfigReader
             return;
         }
 
-        final StringSearchInterpolator interp = new StringSearchInterpolator();
-        interp.addValueSource( new PropertiesBasedValueSource( properties ) );
-
         for ( final Object k : props.keySet() )
         {
             final String key = (String) k;
             String value = props.getProperty( key );
             try
             {
-                value = interp.interpolate( value );
+                value = interpolator.interpolate( value );
             }
             catch ( final InterpolationException e )
             {

@@ -15,6 +15,8 @@
  */
 package org.commonjava.propulsor.config;
 
+import org.codehaus.plexus.interpolation.Interpolator;
+
 import java.io.InputStream;
 import java.util.Properties;
 
@@ -26,5 +28,8 @@ public interface ConfigurationReader
 
     void loadConfiguration( InputStream stream, Properties properties )
         throws ConfigurationException;
+
+    void loadConfiguration( InputStream stream, Interpolator interpolator )
+            throws ConfigurationException;
 
 }

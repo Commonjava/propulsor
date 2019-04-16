@@ -28,6 +28,7 @@ import java.util.regex.Pattern;
 import javax.inject.Inject;
 
 import org.codehaus.plexus.interpolation.InterpolationException;
+import org.codehaus.plexus.interpolation.Interpolator;
 import org.codehaus.plexus.interpolation.PropertiesBasedValueSource;
 import org.codehaus.plexus.interpolation.StringSearchInterpolator;
 import org.commonjava.propulsor.config.*;
@@ -89,7 +90,17 @@ public class DotConfConfigurationReader
 
     @Override
     public void loadConfiguration( final InputStream stream, final Properties properties )
-        throws ConfigurationException
+            throws ConfigurationException
+    {
+        final StringSearchInterpolator interpolator = new StringSearchInterpolator();
+        interpolator.addValueSource( new PropertiesBasedValueSource( properties ) );
+
+        loadConfiguration( stream, interpolator );
+    }
+
+    @Override
+    public void loadConfiguration( final InputStream stream, final Interpolator interpolator )
+            throws ConfigurationException
     {
         Logger logger = LoggerFactory.getLogger( getClass() );
         logger.trace( "Configuration parse starting." );
@@ -106,9 +117,6 @@ public class DotConfConfigurationReader
 
         String sectionName = ConfigurationSectionListener.DEFAULT_SECTION;
         boolean processSection = dispatch.sectionStarted( sectionName );
-
-        final StringSearchInterpolator interp = new StringSearchInterpolator();
-        interp.addValueSource( new PropertiesBasedValueSource( properties ) );
 
         String continuedKey = null;
         StringBuilder continuedVal = null;
@@ -148,7 +156,7 @@ public class DotConfConfigurationReader
 
                         try
                         {
-                            final String value = interp.interpolate( continuedVal.toString() );
+                            final String value = interpolator.interpolate( continuedVal.toString() );
 
                             logger.trace( "Section: {}, parameter: {}, value: {} (raw: {})", sectionName, continuedKey,
                                           value.trim(), continuedVal );
@@ -183,7 +191,7 @@ public class DotConfConfigurationReader
                         String rawVal = value;
                         try
                         {
-                            value = interp.interpolate( rawVal );
+                            value = interpolator.interpolate( rawVal );
                         }
                         catch ( final InterpolationException e )
                         {

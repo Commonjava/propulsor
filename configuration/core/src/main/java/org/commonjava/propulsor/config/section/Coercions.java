@@ -16,9 +16,12 @@
 package org.commonjava.propulsor.config.section;
 
 import org.commonjava.propulsor.config.ConfigurationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
@@ -30,12 +33,25 @@ public final class Coercions
     static
     {
         typeCoercions.put( String.class, s -> s );
+
+        typeCoercions.put( Integer.TYPE, s-> Integer.valueOf( s ) );
         typeCoercions.put( Integer.class, s -> Integer.valueOf( s ) );
+
+        typeCoercions.put( Long.TYPE, s -> Long.valueOf( s ) );
         typeCoercions.put( Long.class, s -> Long.valueOf( s ) );
+
+        typeCoercions.put( Short.TYPE, s -> Short.valueOf( s ) );
         typeCoercions.put( Short.class, s -> Short.valueOf( s ) );
+
+        typeCoercions.put( Float.TYPE, s -> Float.valueOf( s ) );
         typeCoercions.put( Float.class, s -> Float.valueOf( s ) );
+
+        typeCoercions.put( Double.TYPE, s -> Double.valueOf( s ) );
         typeCoercions.put( Double.class, s -> Double.valueOf( s ) );
+
         typeCoercions.put( File.class, s -> new File( s ) );
+
+        typeCoercions.put( Boolean.TYPE, s -> Boolean.valueOf( s ) );
         typeCoercions.put( Boolean.class, s -> Boolean.valueOf( s ) );
     }
 
@@ -45,6 +61,9 @@ public final class Coercions
 
     public static Object coerce( String param, Class<?> ptype, Object source ) throws ConfigurationException
     {
+        Logger logger = LoggerFactory.getLogger( Coercions.class );
+        logger.debug( "Retrieving coercion for: {}", ptype );
+
         Function<String, Object> func = typeCoercions.get( ptype );
         if ( func != null )
         {

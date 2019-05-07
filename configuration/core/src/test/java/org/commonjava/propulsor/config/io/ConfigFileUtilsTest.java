@@ -34,17 +34,6 @@ public class ConfigFileUtilsTest
 {
 
     @Test
-    public void variablesResolvedFromVarsDGlobVariables()
-            throws IOException, ConfigurationException
-    {
-        final File dir = getResourcesDir();
-        final InputStream stream = ConfigFileUtils.readFileWithIncludes( new File( dir, "main.conf" ) );
-        final String config = IOUtils.toString( stream );
-
-        assertThat( config.contains( "some.other.config = blat" ), equalTo( true ) );
-    }
-
-    @Test
     public void readConfigFileWithConfDGlobIncludes()
             throws IOException, ConfigurationException
     {

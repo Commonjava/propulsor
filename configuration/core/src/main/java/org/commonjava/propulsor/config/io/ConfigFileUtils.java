@@ -55,25 +55,13 @@ public final class ConfigFileUtils
     public static InputStream readFileWithIncludes( final String path )
             throws IOException, ConfigurationException
     {
-        return readFileWithIncludes( new File( path ), null );
-    }
-
-    public static InputStream readFileWithIncludes( final String path, Properties props )
-            throws IOException, ConfigurationException
-    {
-        return readFileWithIncludes( new File( path ), props );
+        return readFileWithIncludes( new File( path ) );
     }
 
     public static InputStream readFileWithIncludes( final File f )
             throws IOException, ConfigurationException
     {
-        return readFileWithIncludes( f, null );
-    }
-
-    public static InputStream readFileWithIncludes( final File f, Properties props )
-            throws IOException, ConfigurationException
-    {
-        final List<String> lines = readLinesWithIncludes( f, props, false );
+        final List<String> lines = readLinesWithIncludes( f, false );
 
         return new ByteArrayInputStream( join( lines, LS ).getBytes() );
     }
@@ -95,16 +83,10 @@ public final class ConfigFileUtils
     public static List<String> readLinesWithIncludes( final File f )
             throws IOException, ConfigurationException
     {
-        return readLinesWithIncludes( f, null, false );
+        return readLinesWithIncludes( f, false );
     }
 
-    public static List<String> readLinesWithIncludes( final File f, Properties props )
-            throws IOException, ConfigurationException
-    {
-        return readLinesWithIncludes( f, props, false );
-    }
-
-    public static List<String> readLinesWithIncludes( final File f, Properties props, boolean ignoreVariables )
+    public static List<String> readLinesWithIncludes( final File f, boolean ignoreVariables )
             throws IOException, ConfigurationException
     {
         Properties vars = new Properties();
@@ -118,7 +100,7 @@ public final class ConfigFileUtils
                 final String glob = line.substring( INCLUDE_COMMAND.length() );
                 for ( final File file : findMatching( dir, glob ) )
                 {
-                    lines.addAll( readLinesWithIncludes( file, null, true ) );
+                    lines.addAll( readLinesWithIncludes( file, true ) );
                 }
             }
             else if ( !ignoreVariables && line.startsWith( VARIABLES_COMMAND ) )
@@ -145,26 +127,7 @@ public final class ConfigFileUtils
             }
         }
 
-        StringSearchInterpolator ssi = new StringSearchInterpolator();
-        ssi.addValueSource( new PropertiesBasedValueSource( props ) );
-        ssi.addValueSource( new PropertiesBasedValueSource( vars ) );
-        ssi.addValueSource( new PropertiesBasedValueSource( System.getProperties() ) );
-
-        List<String> result = new ArrayList<String>();
-        for ( String line : lines )
-        {
-            try
-            {
-                result.add( ssi.interpolate( line ) );
-            }
-            catch ( InterpolationException e )
-            {
-                throw new ConfigurationException( "Failed to resolve expressions in '%s'. Reason: %s", e, line,
-                                                  e.getMessage() );
-            }
-        }
-
-        return result;
+        return lines;
     }
 
     public static File[] findMatching( final File dir, String glob )

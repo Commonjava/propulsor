@@ -16,6 +16,7 @@
 package org.commonjava.propulsor.config.dotconf;
 
 import static org.apache.commons.io.IOUtils.readLines;
+import static org.commonjava.propulsor.config.ConfigUtils.loadStandardConfigProperties;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -85,7 +86,7 @@ public class DotConfConfigurationReader
     public void loadConfiguration( final InputStream stream )
         throws ConfigurationException
     {
-        loadConfiguration( stream, System.getProperties() );
+        loadConfiguration( stream, loadStandardConfigProperties() );
     }
 
     @Override

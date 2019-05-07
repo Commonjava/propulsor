@@ -42,8 +42,6 @@ public final class ConfigFileUtils
 
     private static final String INCLUDE_COMMAND = "Include ";
 
-    private static final String VARIABLES_COMMAND = "Variables ";
-
     private static final String GLOB_BASE_PATTERN = "([^\\?\\*]+)[\\\\\\/]([\\*\\?]+.+)";
 
     private static final String GLOB_IDENTIFYING_PATTERN = ".*[\\?\\*].*";
@@ -53,15 +51,15 @@ public final class ConfigFileUtils
     }
 
     public static InputStream readFileWithIncludes( final String path )
-            throws IOException, ConfigurationException
+            throws IOException
     {
         return readFileWithIncludes( new File( path ) );
     }
 
     public static InputStream readFileWithIncludes( final File f )
-            throws IOException, ConfigurationException
+            throws IOException
     {
-        final List<String> lines = readLinesWithIncludes( f, false );
+        final List<String> lines = readLinesWithIncludes( f );
 
         return new ByteArrayInputStream( join( lines, LS ).getBytes() );
     }
@@ -81,44 +79,18 @@ public final class ConfigFileUtils
     }
 
     public static List<String> readLinesWithIncludes( final File f )
-            throws IOException, ConfigurationException
+            throws IOException
     {
-        return readLinesWithIncludes( f, false );
-    }
-
-    public static List<String> readLinesWithIncludes( final File f, boolean ignoreVariables )
-            throws IOException, ConfigurationException
-    {
-        Properties vars = new Properties();
-
         final List<String> lines = new ArrayList<String>();
         final File dir = f.getParentFile();
-        for ( final String line : readLines( f ) )
+        for ( final String line : readLines( f, "UTF-8" ) )
         {
             if ( line.startsWith( INCLUDE_COMMAND ) )
             {
                 final String glob = line.substring( INCLUDE_COMMAND.length() );
                 for ( final File file : findMatching( dir, glob ) )
                 {
-                    lines.addAll( readLinesWithIncludes( file, true ) );
-                }
-            }
-            else if ( !ignoreVariables && line.startsWith( VARIABLES_COMMAND ) )
-            {
-                final String glob = line.substring( VARIABLES_COMMAND.length() );
-                InputStream fs = null;
-                for ( final File file : findMatching( dir, glob ) )
-                {
-                    try
-                    {
-                        fs = new FileInputStream( file );
-                        vars.load( fs );
-                    }
-                    finally
-                    {
-                        IOUtils.closeQuietly( fs );
-                        fs = null;
-                    }
+                    lines.addAll( readLinesWithIncludes( file ) );
                 }
             }
             else

@@ -259,7 +259,7 @@ public class BeanSectionListener<T>
 
         for ( Map.Entry<String, MethodInvoker> entry : methodMap.entrySet() )
         {
-            logger.debug( "Invoking: {}", entry.getValue().method );
+            logger.debug( "Invoking: {} on instance: {}", entry.getValue().method, instance );
 
             try
             {
@@ -278,7 +278,7 @@ public class BeanSectionListener<T>
 
         if ( unsetPropertiesMethod != null && !unmatched.isEmpty() )
         {
-            logger.debug( "Invoking unset-properties method: {}", unsetPropertiesMethod );
+            logger.debug( "Invoking unset-properties method: {} on instance: {}", unsetPropertiesMethod, instance );
 
             try
             {
@@ -333,7 +333,16 @@ public class BeanSectionListener<T>
 
         void invoke( Object instance ) throws InvocationTargetException, IllegalAccessException
         {
-            method.invoke( instance, param );
+            Logger logger = LoggerFactory.getLogger( getClass() );
+            if ( param == null )
+            {
+                logger.debug( "NOT INV method: {} on: {}. Parameter is null!", method, instance );
+            }
+            else
+            {
+                logger.debug( "INV method: {} on: {} with param: {}", method, instance, param );
+                method.invoke( instance, param );
+            }
         }
     }
 
@@ -356,6 +365,8 @@ public class BeanSectionListener<T>
 
         T invoke() throws IllegalAccessException, InvocationTargetException, InstantiationException
         {
+            Logger logger = LoggerFactory.getLogger( getClass() );
+            logger.debug( "INV ctor: {} with args: {}", ctor, args );
             return ctor.newInstance( args );
         }
     }

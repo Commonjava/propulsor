@@ -292,7 +292,7 @@ public class Booter
     public void config() throws ConfiguratorException
     {
         final Instance<Configurator> selection = container.select( Configurator.class );
-        if ( !selection.iterator().hasNext() )
+        if ( selection.isUnsatisfied() )
         {
             logger.info( "No configurator found!" );
             return;
@@ -308,7 +308,7 @@ public class Booter
     public void startLifecycle() throws AppLifecycleException
     {
         final Instance<AppLifecycleManager> selection = container.select( AppLifecycleManager.class );
-        if ( !selection.iterator().hasNext() )
+        if ( selection.isUnsatisfied() )
         {
             logger.info( "No application life cycle manager found!" );
             return;
@@ -325,7 +325,7 @@ public class Booter
     public void deploy() throws DeployException
     {
         final Instance<Deployer> selection = container.select( Deployer.class );
-        if ( !selection.iterator().hasNext() )
+        if ( selection.isUnsatisfied() )
         {
             logger.info( "No deployer found!" );
             return;

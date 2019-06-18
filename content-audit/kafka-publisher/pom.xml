@@ -21,7 +21,7 @@
   <parent>
     <groupId>org.commonjava.propulsor.content-audit</groupId>
     <artifactId>propulsor-content-audit</artifactId>
-    <version>1.4</version>
+    <version>1.5-SNAPSHOT</version>
   </parent>
 
   <artifactId>propulsor-content-audit-kafka-publisher</artifactId>

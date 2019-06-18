@@ -21,7 +21,7 @@
   <parent>
     <groupId>org.commonjava.propulsor.client</groupId>
     <artifactId>propulsor-clients-parent</artifactId>
-    <version>1.4</version>
+    <version>1.5-SNAPSHOT</version>
   </parent>
   
   <artifactId>propulsor-client-http</artifactId>

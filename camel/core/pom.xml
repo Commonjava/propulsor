@@ -21,7 +21,7 @@
   <parent>
     <groupId>org.commonjava.propulsor.camel</groupId>
     <artifactId>propulsor-camel</artifactId>
-    <version>1.4-SNAPSHOT</version>
+    <version>1.4</version>
   </parent>
   
   <artifactId>propulsor-camel-core</artifactId>

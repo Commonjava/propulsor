@@ -67,20 +67,14 @@
 
       <!-- START: metrics support deps-->
       <dependency>
-        <groupId>com.internetitem</groupId>
-        <artifactId>logback-elasticsearch-appender</artifactId>
-        <version>1.6</version>
-      </dependency>
-      
-      <dependency>
-        <groupId>io.github.hengyunabc</groupId>
-        <artifactId>zabbix-api</artifactId>
-        <version>0.0.2</version>
+        <groupId>io.prometheus</groupId>
+        <artifactId>simpleclient_servlet</artifactId>
+        <version>${prometheusClientVersion}</version>
       </dependency>
       <dependency>
-        <groupId>io.github.hengyunabc</groupId>
-        <artifactId>zabbix-sender</artifactId>
-        <version>0.0.4</version>
+        <groupId>io.prometheus</groupId>
+        <artifactId>simpleclient_dropwizard</artifactId>
+        <version>${prometheusClientVersion}</version>
       </dependency>
       <!-- END: metrics support deps -->
     </dependencies>
@@ -88,8 +82,11 @@
   
   <modules>
     <module>core</module>
+    <module>servlet</module>
     <module>dropwizard</module>
+    <module>dw-servlet</module>
     <module>reporter-dw-graphite</module>
+    <module>reporter-dw-prometheus</module>
   </modules>
   
 </project>

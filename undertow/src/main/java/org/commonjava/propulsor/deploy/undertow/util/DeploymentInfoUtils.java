@@ -70,6 +70,11 @@ public final class DeploymentInfoUtils
 
     public static void merge( final DeploymentInfo into, final DeploymentInfo from )
     {
+        if ( from == null )
+        {
+            return;
+        }
+
         final Map<String, AuthenticationMechanismFactory> authMechs = from.getAuthenticationMechanisms();
         if ( authMechs != null )
         {

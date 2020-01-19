@@ -1,6 +1,7 @@
 package org.commonjava.propulsor.metrics.cumulative;
 
 import org.commonjava.cdi.util.weft.ThreadContext;
+import org.commonjava.propulsor.metrics.MetricsManager;
 import org.commonjava.propulsor.metrics.spi.TimingContext;
 
 import java.util.Arrays;
@@ -18,13 +19,16 @@ public class CumulativeTimingContextWrapper
 {
     private final TimingContext context;
 
+    private MetricsManager manager;
+
     private Set<String> names;
 
     private long start;
 
-    public CumulativeTimingContextWrapper( TimingContext context, String... names )
+    public CumulativeTimingContextWrapper( TimingContext context, MetricsManager manager, String... names )
     {
         this.context = context;
+        this.manager = manager;
         this.names = new HashSet<>( Arrays.asList( names ) );
     }
 
@@ -40,24 +44,9 @@ public class CumulativeTimingContextWrapper
     {
         Set<Long> results = context.stop();
 
+
         double elapsed = (System.nanoTime() - start) / NANOS_PER_MILLISECOND;
-
-        names.forEach( name->{
-            ThreadContext ctx = ThreadContext.getContext( true );
-            if ( ctx != null )
-            {
-                ctx.putIfAbsent( CUMULATIVE_TIMINGS, new ConcurrentHashMap<>() );
-                Map<String, Double> timingMap = (Map<String, Double>) ctx.get( CUMULATIVE_TIMINGS );
-
-                timingMap.merge( name, elapsed, Double::sum );
-
-                ctx.putIfAbsent( CUMULATIVE_COUNTS, new ConcurrentHashMap<>() );
-                Map<String, Integer> countMap =
-                        (Map<String, Integer>) ctx.get( CUMULATIVE_COUNTS );
-
-                countMap.merge( name, 1, ( existingVal, newVal ) -> existingVal + 1 );
-            }
-        } );
+        manager.accumulate( names, elapsed );
 
         return results;
     }

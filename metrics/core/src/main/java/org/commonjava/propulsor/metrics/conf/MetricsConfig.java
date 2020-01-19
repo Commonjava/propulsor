@@ -39,6 +39,8 @@ public class MetricsConfig
 
     private String instancePrefix;
 
+    private Integer meterRatio;
+
     public String getInstancePrefix()
     {
         return instancePrefix;
@@ -50,4 +52,14 @@ public class MetricsConfig
         this.instancePrefix = instancePrefix;
     }
 
+    public int getMeterRatio()
+    {
+        return meterRatio == null ? 1 : meterRatio;
+    }
+
+    @ConfigName( "meter.ratio" )
+    public void setMeterRatio( Integer ratio )
+    {
+        this.meterRatio = meterRatio;
+    }
 }

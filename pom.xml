@@ -50,6 +50,7 @@
     <logbackVersion>1.2.3</logbackVersion>
     <slf4jVersion>1.7.25</slf4jVersion>
     <metricsVersion>4.0.2</metricsVersion>
+    <prometheusClientVersion>0.7.0</prometheusClientVersion>
 
     <javaVersion>1.8</javaVersion>
     <maven.compiler.source>${javaVersion}</maven.compiler.source>
@@ -118,7 +119,22 @@
       </dependency>
       <dependency>
         <groupId>org.commonjava.propulsor.metrics</groupId>
+        <artifactId>propulsor-metrics-servlet</artifactId>
+        <version>1.5-SNAPSHOT</version>
+      </dependency>
+      <dependency>
+        <groupId>org.commonjava.propulsor.metrics</groupId>
+        <artifactId>propulsor-metrics-dw-servlet</artifactId>
+        <version>1.5-SNAPSHOT</version>
+      </dependency>
+      <dependency>
+        <groupId>org.commonjava.propulsor.metrics</groupId>
         <artifactId>propulsor-metrics-reporter-dw-graphite</artifactId>
+        <version>1.5-SNAPSHOT</version>
+      </dependency>
+      <dependency>
+        <groupId>org.commonjava.propulsor.metrics</groupId>
+        <artifactId>propulsor-metrics-reporter-dw-prometheus</artifactId>
         <version>1.5-SNAPSHOT</version>
       </dependency>
 

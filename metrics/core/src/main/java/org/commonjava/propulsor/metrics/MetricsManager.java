@@ -15,6 +15,7 @@
  */
 package org.commonjava.propulsor.metrics;
 
+import com.codahale.metrics.Gauge;
 import org.commonjava.cdi.util.weft.ThreadContext;
 import org.commonjava.propulsor.metrics.annotation.MetricNamed;
 import org.commonjava.propulsor.metrics.conf.MetricsConfig;
@@ -27,13 +28,22 @@ import org.slf4j.LoggerFactory;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.interceptor.InvocationContext;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Random;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
 import static com.codahale.metrics.MetricRegistry.name;
 import static org.apache.commons.lang3.ClassUtils.getAbbreviatedName;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.commonjava.propulsor.metrics.MetricsConstants.CUMULATIVELY_METERED;
+import static org.commonjava.propulsor.metrics.MetricsConstants.CUMULATIVE_COUNTS;
+import static org.commonjava.propulsor.metrics.MetricsConstants.CUMULATIVE_TIMINGS;
 import static org.commonjava.propulsor.metrics.MetricsConstants.DEFAULT;
 import static org.commonjava.propulsor.metrics.MetricsConstants.EXCEPTION;
 import static org.commonjava.propulsor.metrics.MetricsConstants.SKIP_METRIC;
@@ -47,6 +57,8 @@ public class MetricsManager
 {
 
     private static final Logger logger = LoggerFactory.getLogger( MetricsManager.class );
+
+    private final Random random = new Random();
 
     private final MetricsProvider metricsProvider;
 
@@ -73,9 +85,9 @@ public class MetricsManager
         metricsProvider.mark( names );
     }
 
-    public void mark( String... names )
+    public void mark( Set<String> names, long count )
     {
-        metricsProvider.mark( names );
+        metricsProvider.mark( names, count );
     }
 
     public TimingContext time( final Set<String> timerNames )
@@ -108,7 +120,7 @@ public class MetricsManager
         TimingContext timingContext = metricsProvider.time( timerName );
         if ( isMeteredCumulatively() )
         {
-            timingContext = new CumulativeTimingContextWrapper( timingContext, metricName );
+            timingContext = new CumulativeTimingContextWrapper( timingContext, this, metricName );
         }
 
         timingContext.start();
@@ -117,21 +129,21 @@ public class MetricsManager
 
         try
         {
-            metricsProvider.mark( startName );
+            metricsProvider.mark( Collections.singleton( startName ) );
 
             return method.get();
         }
         catch ( Throwable e )
         {
             eClassName = name( name, EXCEPTION, e.getClass().getSimpleName() );
-            metricsProvider.mark( errorName, eClassName );
+            metricsProvider.mark( new HashSet<>( Arrays.asList( errorName, eClassName ) ) );
 
             throw e;
         }
         finally
         {
             timingContext.stop();
-            metricsProvider.mark( metricName );
+            metricsProvider.mark( Collections.singleton( metricName ) );
         }
     }
 
@@ -148,6 +160,21 @@ public class MetricsManager
         }
 
         return ( ctx == null || ((Boolean) ctx.getOrDefault( CUMULATIVELY_METERED, Boolean.TRUE ) ) );
+    }
+
+    public boolean isMetered( Supplier<Boolean> meteringOverride )
+    {
+        int meterRatio = config.getMeterRatio();
+        if ( meterRatio <= 1 || random.nextInt() % meterRatio == 0 )
+        {
+            return true;
+        }
+        else if ( meteringOverride != null && Boolean.TRUE.equals( meteringOverride.get() ) )
+        {
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -176,8 +203,66 @@ public class MetricsManager
         return name( instancePrefix, name, suffix );
     }
 
+    /**
+     * Get the metric fullname.
+     * @param name user specified name
+     * @param defaultName 'class name + method name', not null.
+     */
+    public String getName( String instancePrefix, String name, String defaultName, String suffix )
+    {
+        if ( isBlank( name ) || name.equals( DEFAULT ) )
+        {
+            name = defaultName;
+        }
+        return name( instancePrefix, name, suffix );
+    }
+
     public TimingContext timeAll( final Set<String> timerNames )
     {
         return metricsProvider.time( timerNames );
+    }
+
+    public void accumulate( final String name, final Double elapsed )
+    {
+        accumulate( Collections.singleton( name ), elapsed );
+    }
+
+    public void accumulate( final Set<String> names, final Double elapsed )
+    {
+        names.forEach( name->{
+            ThreadContext ctx = ThreadContext.getContext( true );
+            if ( ctx != null )
+            {
+                ctx.putIfAbsent( CUMULATIVE_TIMINGS, new ConcurrentHashMap<>() );
+                Map<String, Double> timingMap = (Map<String, Double>) ctx.get( CUMULATIVE_TIMINGS );
+
+                timingMap.merge( name, elapsed, Double::sum );
+
+                ctx.putIfAbsent( CUMULATIVE_COUNTS, new ConcurrentHashMap<>() );
+                Map<String, Integer> countMap =
+                        (Map<String, Integer>) ctx.get( CUMULATIVE_COUNTS );
+
+                countMap.merge( name, 1, ( existingVal, newVal ) -> existingVal + 1 );
+            }
+        } );
+    }
+
+    public MeteringContext getMeter( final String name )
+    {
+        return getMeter( Collections.singleton( name ) );
+    }
+
+    public MeteringContext getMeter( final Set<String> names )
+    {
+        return new MeteringContext( names, this );
+    }
+
+    public void registerGauges( final String baseName, final Map<String, Supplier<?>> gauges )
+    {
+        Map<String, Supplier<?>> fullyNamed = new HashMap<>();
+        gauges.forEach( (name, gauge)->{
+            fullyNamed.put(getName( config.getInstancePrefix(), DEFAULT, baseName, name ), gauge);
+        } );
+        metricsProvider.registerGauges( fullyNamed );
     }
 }

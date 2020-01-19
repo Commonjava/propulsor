@@ -15,9 +15,9 @@
  */
 package org.commonjava.propulsor.metrics.dropwizard;
 
+import com.codahale.metrics.Gauge;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.health.HealthCheckRegistry;
-import org.commonjava.propulsor.metrics.conf.MetricsConfig;
 import org.commonjava.propulsor.metrics.dropwizard.config.DropwizardConfig;
 import org.commonjava.propulsor.metrics.dropwizard.spi.MetricsInitializer;
 import org.commonjava.propulsor.metrics.spi.MetricsProvider;
@@ -30,8 +30,12 @@ import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
+
+import static com.codahale.metrics.MetricRegistry.name;
 
 /**
  * Created by xiabai on 2/27/17. Adapted to propulsor by John Casey, 2020.
@@ -107,8 +111,19 @@ public class DropwizardMetrics
     }
 
     @Override
-    public void mark( final String... metricNames )
+    public void mark( final Set<String> metricNames, long count )
     {
-        mark( new HashSet<>( Arrays.asList( metricNames ) ) );
+        metricNames.stream()
+                   .filter( name -> config.isEnabled( name ) )
+                   .forEach( name -> metricRegistry.meter( name ).mark( count ) );
+    }
+
+    @Override
+    public void registerGauges( final Map<String, Supplier<?>> gauges )
+    {
+        gauges.forEach( (name, supplier)->{
+            Gauge<?> gauge = () -> supplier.get();
+            metricRegistry.gauge( name, () -> gauge);
+        } );
     }
 }

@@ -25,23 +25,36 @@
     <version>1.5-SNAPSHOT</version>
   </parent>
 
-  <artifactId>propulsor-metrics-core</artifactId>
+  <artifactId>propulsor-metrics-reporter-dw-graphite</artifactId>
 
-  <name>Propulsor :: Metrics Core</name>
+  <name>Propulsor :: Metrics Reporter :: Graphite</name>
 
   <dependencies>
+    <dependency>
+      <groupId>org.commonjava.propulsor.metrics</groupId>
+      <artifactId>propulsor-metrics-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.commonjava.propulsor.metrics</groupId>
+      <artifactId>propulsor-metrics-dropwizard</artifactId>
+    </dependency>
+
     <dependency>
       <groupId>org.commonjava.propulsor.config</groupId>
       <artifactId>propulsor-configuration-core</artifactId>
     </dependency>
 
     <dependency>
-      <groupId>org.commonjava.cdi.util</groupId>
-      <artifactId>weft</artifactId>
+      <groupId>io.dropwizard.metrics</groupId>
+      <artifactId>metrics-core</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.apache.commons</groupId>
-      <artifactId>commons-lang3</artifactId>
+      <groupId>io.dropwizard.metrics</groupId>
+      <artifactId>metrics-graphite</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.dropwizard.metrics</groupId>
+      <artifactId>metrics-healthchecks</artifactId>
     </dependency>
   </dependencies>
 </project>

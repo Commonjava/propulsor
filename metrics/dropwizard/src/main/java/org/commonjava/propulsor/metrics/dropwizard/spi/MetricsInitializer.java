@@ -13,19 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.commonjava.propulsor.metrics.annotation;
+package org.commonjava.propulsor.metrics.dropwizard.spi;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
+import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.health.HealthCheckRegistry;
 
-import static java.lang.annotation.ElementType.METHOD;
-import static java.lang.annotation.ElementType.TYPE;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
-import static org.commonjava.propulsor.metrics.MetricsConstants.DEFAULT;
-
-@Target( { METHOD, TYPE } )
-@Retention( RUNTIME )
-public @interface MetricNamed
+/**
+ * Interface designed to inject a subclass of {@link ReporterConfiguration} and initialize a Metrics reporter based on
+ * its configuration.
+ */
+public interface MetricsInitializer
 {
-    String value() default DEFAULT;
+    void initialize( MetricRegistry registry, HealthCheckRegistry healthCheckRegistry );
 }

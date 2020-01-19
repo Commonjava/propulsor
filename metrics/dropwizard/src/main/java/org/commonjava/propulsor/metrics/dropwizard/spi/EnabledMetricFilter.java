@@ -13,19 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.commonjava.propulsor.metrics.annotation;
+package org.commonjava.propulsor.metrics.dropwizard.spi;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
+import com.codahale.metrics.Metric;
+import com.codahale.metrics.MetricFilter;
+import org.commonjava.propulsor.metrics.conf.MetricSubsetConfig;
 
-import static java.lang.annotation.ElementType.METHOD;
-import static java.lang.annotation.ElementType.TYPE;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
-import static org.commonjava.propulsor.metrics.MetricsConstants.DEFAULT;
-
-@Target( { METHOD, TYPE } )
-@Retention( RUNTIME )
-public @interface MetricNamed
+public class EnabledMetricFilter
+    implements MetricFilter
 {
-    String value() default DEFAULT;
+    private MetricSubsetConfig<?> enabledMetrics;
+
+    public EnabledMetricFilter( MetricSubsetConfig<?> enabledMetrics )
+    {
+        this.enabledMetrics = enabledMetrics;
+    }
+
+    @Override
+    public boolean matches( String name, Metric metric )
+    {
+        return enabledMetrics.isEnabled( name );
+    }
 }

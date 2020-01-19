@@ -29,9 +29,9 @@ import java.util.concurrent.TimeUnit;
 @Named
 @SectionName( MetricsConfig.SECTION_NAME )
 public class MetricsConfig
-        extends EnabledMetrics<MetricsConfig>
+        extends MetricSubsetConfig<MetricsConfig>
 {
-    public static final String SECTION_NAME = "metrics";
+    public static final String SECTION_NAME = "metrics.global";
 
     public static final TimeUnit RATE_TIMEUNIT = TimeUnit.MILLISECONDS;
 
@@ -39,11 +39,7 @@ public class MetricsConfig
 
     private String instancePrefix;
 
-    @Override
-    protected String getEnabledPrefix()
-    {
-        return "";
-    }
+    private Integer meterRatio;
 
     public String getInstancePrefix()
     {
@@ -56,4 +52,14 @@ public class MetricsConfig
         this.instancePrefix = instancePrefix;
     }
 
+    public int getMeterRatio()
+    {
+        return meterRatio == null ? 1 : meterRatio;
+    }
+
+    @ConfigName( "meter.ratio" )
+    public void setMeterRatio( Integer ratio )
+    {
+        this.meterRatio = meterRatio;
+    }
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015 John Casey (jdcasey@commonjava.org)
+ * Copyright (C) 2011-2020 Red Hat, Inc. (https://github.com/Commonjava/indy)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,19 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.commonjava.propulsor.metrics.annotation;
+package org.commonjava.propulsor.metrics.dropwizard.servlet;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
+import com.codahale.metrics.health.HealthCheckRegistry;
+import com.codahale.metrics.servlets.HealthCheckServlet;
 
-import static java.lang.annotation.ElementType.METHOD;
-import static java.lang.annotation.ElementType.TYPE;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
-import static org.commonjava.propulsor.metrics.MetricsConstants.DEFAULT;
+import javax.enterprise.inject.spi.CDI;
 
-@Target( { METHOD, TYPE } )
-@Retention( RUNTIME )
-public @interface MetricNamed
+public class DropwizardHealthCheckServletContextListener
+        extends HealthCheckServlet.ContextListener
 {
-    String value() default DEFAULT;
+    @Override
+    protected HealthCheckRegistry getHealthCheckRegistry()
+    {
+        return CDI.current().select( HealthCheckRegistry.class ).get();
+    }
 }

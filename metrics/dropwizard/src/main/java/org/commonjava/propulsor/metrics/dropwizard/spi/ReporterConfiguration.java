@@ -13,19 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.commonjava.propulsor.metrics.annotation;
+package org.commonjava.propulsor.metrics.dropwizard.spi;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
+import org.commonjava.propulsor.metrics.conf.MetricSubsetConfig;
 
-import static java.lang.annotation.ElementType.METHOD;
-import static java.lang.annotation.ElementType.TYPE;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
-import static org.commonjava.propulsor.metrics.MetricsConstants.DEFAULT;
-
-@Target( { METHOD, TYPE } )
-@Retention( RUNTIME )
-public @interface MetricNamed
+/**
+ * Reporters can configure themselves by implementing this.
+ */
+public abstract class ReporterConfiguration<T extends ReporterConfiguration>
+        extends MetricSubsetConfig<T>
 {
-    String value() default DEFAULT;
+    private long reportPeriod;
+
+    public long getReportSeconds()
+    {
+        return reportPeriod;
+    }
+
+    public void setReportPeriod( long reportPeriod )
+    {
+        this.reportPeriod = reportPeriod;
+    }
 }

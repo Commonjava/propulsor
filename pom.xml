@@ -39,6 +39,9 @@
     <jhttpcVersion>1.6</jhttpcVersion>
     <httpTestserverVersion>1.3</httpTestserverVersion>
 
+    <weftVersion>1.15</weftVersion>
+    <galleyVersion>1.0</galleyVersion>
+
     <resteasyVersion>3.1.4.Final</resteasyVersion>
     <undertowVersion>2.0.27.Final</undertowVersion>
     <jacksonVersion>2.10.1</jacksonVersion>
@@ -47,6 +50,7 @@
     <logbackVersion>1.2.3</logbackVersion>
     <slf4jVersion>1.7.25</slf4jVersion>
     <metricsVersion>4.0.2</metricsVersion>
+    <prometheusClientVersion>0.7.0</prometheusClientVersion>
 
     <javaVersion>1.8</javaVersion>
     <maven.compiler.source>${javaVersion}</maven.compiler.source>
@@ -110,17 +114,27 @@
       </dependency>
       <dependency>
         <groupId>org.commonjava.propulsor.metrics</groupId>
-        <artifactId>propulsor-metrics-reporter-zabbix</artifactId>
+        <artifactId>propulsor-metrics-dropwizard</artifactId>
         <version>1.5-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.commonjava.propulsor.metrics</groupId>
-        <artifactId>propulsor-metrics-reporter-graphite</artifactId>
+        <artifactId>propulsor-metrics-servlet</artifactId>
         <version>1.5-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.commonjava.propulsor.metrics</groupId>
-        <artifactId>propulsor-metrics-reporter-elasticsearch</artifactId>
+        <artifactId>propulsor-metrics-dw-servlet</artifactId>
+        <version>1.5-SNAPSHOT</version>
+      </dependency>
+      <dependency>
+        <groupId>org.commonjava.propulsor.metrics</groupId>
+        <artifactId>propulsor-metrics-reporter-dw-graphite</artifactId>
+        <version>1.5-SNAPSHOT</version>
+      </dependency>
+      <dependency>
+        <groupId>org.commonjava.propulsor.metrics</groupId>
+        <artifactId>propulsor-metrics-reporter-dw-prometheus</artifactId>
         <version>1.5-SNAPSHOT</version>
       </dependency>
 
@@ -144,6 +158,18 @@
         <groupId>org.commonjava.propulsor.content-audit</groupId>
         <artifactId>propulsor-content-audit-kafka-publisher</artifactId>
         <version>1.5-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.commonjava.maven.galley</groupId>
+        <artifactId>galley-api</artifactId>
+        <version>${galleyVersion}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.commonjava.cdi.util</groupId>
+        <artifactId>weft</artifactId>
+        <version>${weftVersion}</version>
       </dependency>
 
       <dependency>

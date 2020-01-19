@@ -25,23 +25,45 @@
     <version>1.5-SNAPSHOT</version>
   </parent>
 
-  <artifactId>propulsor-metrics-core</artifactId>
+  <artifactId>propulsor-metrics-reporter-dw-prometheus</artifactId>
 
-  <name>Propulsor :: Metrics Core</name>
+  <name>Propulsor :: Metrics Reporter :: Prometheus</name>
 
   <dependencies>
+    <dependency>
+      <groupId>org.commonjava.propulsor.metrics</groupId>
+      <artifactId>propulsor-metrics-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.commonjava.propulsor.metrics</groupId>
+      <artifactId>propulsor-metrics-dropwizard</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.commonjava.propulsor.metrics</groupId>
+      <artifactId>propulsor-metrics-dw-servlet</artifactId>
+    </dependency>
+
     <dependency>
       <groupId>org.commonjava.propulsor.config</groupId>
       <artifactId>propulsor-configuration-core</artifactId>
     </dependency>
 
     <dependency>
-      <groupId>org.commonjava.cdi.util</groupId>
-      <artifactId>weft</artifactId>
+      <groupId>io.dropwizard.metrics</groupId>
+      <artifactId>metrics-core</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.apache.commons</groupId>
-      <artifactId>commons-lang3</artifactId>
+      <groupId>io.dropwizard.metrics</groupId>
+      <artifactId>metrics-healthchecks</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>io.prometheus</groupId>
+      <artifactId>simpleclient_servlet</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.prometheus</groupId>
+      <artifactId>simpleclient_dropwizard</artifactId>
     </dependency>
   </dependencies>
 </project>

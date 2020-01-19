@@ -13,19 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.commonjava.propulsor.metrics.annotation;
+package org.commonjava.propulsor.metrics.dropwizard.spi;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
+import com.codahale.metrics.health.HealthCheck;
 
-import static java.lang.annotation.ElementType.METHOD;
-import static java.lang.annotation.ElementType.TYPE;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
-import static org.commonjava.propulsor.metrics.MetricsConstants.DEFAULT;
+import static org.apache.commons.lang3.ClassUtils.getAbbreviatedName;
 
-@Target( { METHOD, TYPE } )
-@Retention( RUNTIME )
-public @interface MetricNamed
+public abstract class ManagedHealthCheck
+        extends HealthCheck
 {
-    String value() default DEFAULT;
+
+    public String getName()
+    {
+        return getAbbreviatedName( this.getClass().getName(), 1 );
+    }
+
 }

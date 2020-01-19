@@ -13,41 +13,42 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.commonjava.propulsor.metrics.conf;
+package org.commonjava.propulsor.metrics.graphite.conf;
 
 import org.commonjava.propulsor.config.annotation.ConfigName;
 import org.commonjava.propulsor.config.annotation.SectionName;
+import org.commonjava.propulsor.metrics.dropwizard.spi.ReporterConfiguration;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Named;
-import java.util.concurrent.TimeUnit;
 
-/**
- * Globally turn on/off metrics by name hierarchy, or globally enable/disable the metrics system.
- */
 @ApplicationScoped
-@Named
-@SectionName( MetricsConfig.SECTION_NAME )
-public class MetricsConfig
-        extends MetricSubsetConfig<MetricsConfig>
+@SectionName( "metrics.dropwizard.graphite" )
+public class GraphiteReporterConfig
+        extends ReporterConfiguration<GraphiteReporterConfig>
 {
-    public static final String SECTION_NAME = "metrics.global";
+    private String host;
 
-    public static final TimeUnit RATE_TIMEUNIT = TimeUnit.MILLISECONDS;
+    private Integer port;
 
-    public static final TimeUnit DURATION_TIMEUNIT = TimeUnit.SECONDS;
-
-    private String instancePrefix;
-
-    public String getInstancePrefix()
+    public String getHost()
     {
-        return instancePrefix;
+        return host;
     }
 
-    @ConfigName( "instance.prefix" )
-    public void setInstancePrefix( final String instancePrefix )
+    @ConfigName( "host" )
+    public void setHost( String host )
     {
-        this.instancePrefix = instancePrefix;
+        this.host = host;
     }
 
+    public Integer getPort()
+    {
+        return port;
+    }
+
+    @ConfigName( "port" )
+    public void setPort( Integer port )
+    {
+        this.port = port;
+    }
 }

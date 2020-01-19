@@ -88,9 +88,8 @@
   
   <modules>
     <module>core</module>
-    <module>reporter-zabbix</module>
-    <module>reporter-elasticsearch</module>
-    <module>reporter-graphite</module>
+    <module>dropwizard</module>
+    <module>reporter-dw-graphite</module>
   </modules>
   
 </project>

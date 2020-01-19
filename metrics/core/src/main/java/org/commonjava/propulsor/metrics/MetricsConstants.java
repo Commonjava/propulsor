@@ -23,4 +23,19 @@ public class MetricsConstants
 
     public static final String TIMER = "timer";
 
+    public static final String DEFAULT = "default";
+
+    public static final String SKIP_METRIC = "skip-this-metric";
+
+    public static final String CUMULATIVELY_METERED = "cumulatively-metered";
+
+    public static final String CUMULATIVE_TIMINGS = "cumulative-timings";
+
+    public static final String CUMULATIVE_COUNTS = "cumulative-counts";
+
+    // for measuring transfer rates...
+    public static final double NANOS_PER_SEC = 1E9;
+
+    // for measuring timing in ms...
+    public static final double NANOS_PER_MILLISECOND = 1E6;
 }

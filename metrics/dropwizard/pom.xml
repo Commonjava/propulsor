@@ -25,9 +25,9 @@
     <version>1.5-SNAPSHOT</version>
   </parent>
 
-  <artifactId>propulsor-metrics-core</artifactId>
+  <artifactId>propulsor-metrics-dropwizard</artifactId>
 
-  <name>Propulsor :: Metrics Core</name>
+  <name>Propulsor :: Metrics Dropwizard Adapter</name>
 
   <dependencies>
     <dependency>
@@ -36,8 +36,25 @@
     </dependency>
 
     <dependency>
-      <groupId>org.commonjava.cdi.util</groupId>
-      <artifactId>weft</artifactId>
+      <groupId>org.commonjava.propulsor.metrics</groupId>
+      <artifactId>propulsor-metrics-core</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>io.dropwizard.metrics</groupId>
+      <artifactId>metrics-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.dropwizard.metrics</groupId>
+      <artifactId>metrics-jvm</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.dropwizard.metrics</groupId>
+      <artifactId>metrics-healthchecks</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.commonjava.util</groupId>
+      <artifactId>http-testserver</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.commons</groupId>

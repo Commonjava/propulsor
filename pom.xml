@@ -403,8 +403,6 @@
     <module>core</module>
     <module>resteasy</module>
     <module>undertow</module>
-    <module>clients</module>
-    <module>camel</module>
     <module>metrics</module>
     <module>configuration</module>
     <module>content-audit</module>

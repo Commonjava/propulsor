@@ -137,7 +137,7 @@ public class Booter
 
     public static void setUncaughtExceptionHandler()
     {
-        Thread.currentThread().setUncaughtExceptionHandler( ( thread, error ) -> {
+        Thread.setDefaultUncaughtExceptionHandler( ( thread, error ) -> {
             if ( error instanceof InvocationTargetException )
             {
                 final InvocationTargetException ite = (InvocationTargetException) error;

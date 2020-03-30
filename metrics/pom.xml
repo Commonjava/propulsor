@@ -88,7 +88,6 @@
   
   <modules>
     <module>core</module>
-    <module>reporter-zabbix</module>
     <module>reporter-elasticsearch</module>
     <module>reporter-graphite</module>
   </modules>

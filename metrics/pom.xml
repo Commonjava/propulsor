@@ -86,6 +86,19 @@
     </dependencies>
   </dependencyManagement>
   
+  <dependencies>
+    <dependency>
+      <groupId>javax.annotation</groupId>
+      <artifactId>javax.annotation-api</artifactId>
+      <version>${annotationVersion}</version>
+    </dependency>
+    <dependency>
+      <groupId>javax.activation</groupId>
+      <artifactId>javax.activation-api</artifactId>
+      <version>${activationVersion}</version>
+    </dependency>
+  </dependencies>
+
   <modules>
     <module>core</module>
     <module>reporter-elasticsearch</module>

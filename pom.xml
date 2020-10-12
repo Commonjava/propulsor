@@ -41,6 +41,7 @@
 
     <resteasyVersion>3.1.4.Final</resteasyVersion>
     <undertowVersion>2.0.27.Final</undertowVersion>
+    <xnioApiVersion>3.8.0.Final</xnioApiVersion>
     <jacksonVersion>2.10.1</jacksonVersion>
     <weldVersion>2.4.6.Final</weldVersion>
     <swaggerVersion>1.5.16</swaggerVersion>
@@ -200,6 +201,12 @@
         <groupId>org.jboss.spec.javax.servlet</groupId>
         <artifactId>jboss-servlet-api_3.0_spec</artifactId>
         <version>1.0.2.Final</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.jboss.xnio</groupId>
+        <artifactId>xnio-api</artifactId>
+        <version>${xnioApiVersion}</version>
       </dependency>
 
       <dependency>

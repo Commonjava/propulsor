@@ -16,6 +16,7 @@
 package org.commonjava.propulsor.deploy.undertow;
 
 import io.undertow.Undertow;
+import io.undertow.UndertowOptions;
 import io.undertow.predicate.Predicate;
 import io.undertow.predicate.Predicates;
 import io.undertow.server.HttpHandler;
@@ -136,6 +137,7 @@ public class UndertowDeployer
                     {
                         usingPort.set( foundPort );
                         undertow = Undertow.builder()
+                                           .setServerOption( UndertowOptions.ENABLE_HTTP2, true )
                                            .setHandler( getHandler( dm ) )
                                            .addHttpListener( foundPort, bootOptions.getBind() )
                                            .build();

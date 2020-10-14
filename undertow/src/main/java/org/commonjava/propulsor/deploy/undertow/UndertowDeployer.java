@@ -136,13 +136,7 @@ public class UndertowDeployer
                     try
                     {
                         usingPort.set( foundPort );
-                        undertow = Undertow.builder()
-                                           .setServerOption( UndertowOptions.ENABLE_HTTP2, true )
-                                           .setHandler( getHandler( dm ) )
-                                           .addHttpListener( foundPort, bootOptions.getBind() )
-                                           .build();
-
-                        undertow.start();
+                        undertow = getUndertowServer( dm, foundPort, bootOptions );
                     }
                     catch ( ServletException e )
                     {
@@ -157,21 +151,14 @@ public class UndertowDeployer
                 {
                     throw e;
                 }
-
                 bootOptions.setPort( usingPort.get() );
             }
             else
             {
                 usingPort.set( port );
-                server = Undertow.builder()
-                                 .setHandler( getHandler( dm ) )
-                                 .addHttpListener( port, bootOptions.getBind() )
-                                 .build();
-
-
-                server.start();
+                server = getUndertowServer( dm, port, bootOptions );
             }
-
+            server.start();
             System.out.printf( "%s listening on %s:%s\n\n", bootOptions.getApplicationName(), bootOptions.getBind(), bootOptions.getPort() );
 
         }
@@ -179,6 +166,17 @@ public class UndertowDeployer
         {
             throw new DeployException( "Failed to deploy", e );
         }
+    }
+
+    private Undertow getUndertowServer( DeploymentManager dm, int foundPort, BootOptions bootOptions )
+                    throws ServletException
+    {
+        logger.info( "Build Undertow with HTTP/2 enabled" );
+        return Undertow.builder()
+                       .setServerOption( UndertowOptions.ENABLE_HTTP2, true )
+                       .setHandler( getHandler( dm ) )
+                       .addHttpListener( foundPort, bootOptions.getBind() )
+                       .build();
     }
 
     private HttpHandler getHandler( final DeploymentManager dm )

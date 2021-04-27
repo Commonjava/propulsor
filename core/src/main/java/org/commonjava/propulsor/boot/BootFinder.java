@@ -35,16 +35,15 @@ public class BootFinder
     public static BootInterface find( final ClassLoader classloader )
                     throws BootException
     {
-        final InputStream stream =
-                        classloader.getResourceAsStream( "META-INF/services/" + BootInterface.class.getName() );
-        if ( stream == null )
-        {
-            throw new BootException( "No BootInterface implementations registered." );
-        }
-
         List<String> lines;
-        try
+        try ( InputStream stream =
+                        classloader.getResourceAsStream( "META-INF/services/" + BootInterface.class.getName() ) )
         {
+            if ( stream == null )
+            {
+                throw new BootException( "No BootInterface implementations registered." );
+            }
+    
             lines = IOUtils.readLines( stream );
         }
         catch ( final IOException e )

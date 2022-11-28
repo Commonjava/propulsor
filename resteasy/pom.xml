@@ -74,10 +74,6 @@
     </dependency>
     
     <dependency>
-      <groupId>javax.enterprise</groupId>
-      <artifactId>cdi-api</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>log4j-over-slf4j</artifactId>
     </dependency>
@@ -94,7 +90,7 @@
     </dependency>
     <dependency>
       <groupId>org.jboss.weld.se</groupId>
-      <artifactId>weld-se-core</artifactId>
+      <artifactId>weld-se-shaded</artifactId>
       <scope>provided</scope>
     </dependency>
 

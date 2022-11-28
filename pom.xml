@@ -22,7 +22,7 @@
   <parent>
     <groupId>org.commonjava</groupId>
     <artifactId>commonjava</artifactId>
-    <version>13</version>
+    <version>16</version>
   </parent>
 
   <groupId>org.commonjava.propulsor</groupId>
@@ -32,7 +32,7 @@
 
   <name>Propulsor :: Parent</name>
   <url>https://github.com/jdcasey/propulsor</url>
-  <inceptionYear>2015</inceptionYear>
+  <inceptionYear>2022</inceptionYear>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -43,7 +43,7 @@
     <undertowVersion>2.2.19.Final</undertowVersion>
     <xnioApiVersion>3.8.0.Final</xnioApiVersion>
     <jacksonVersion>2.13.3</jacksonVersion>
-    <weldVersion>2.4.6.Final</weldVersion>
+    <weldVersion>3.1.9.Final</weldVersion>
     <swaggerVersion>1.5.16</swaggerVersion>
     <logbackVersion>1.2.3</logbackVersion>
     <slf4jVersion>1.7.26</slf4jVersion>
@@ -287,12 +287,7 @@
       </dependency>
       <dependency>
         <groupId>org.jboss.weld.se</groupId>
-        <artifactId>weld-se</artifactId>
-        <version>${weldVersion}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.jboss.weld.se</groupId>
-        <artifactId>weld-se-core</artifactId>
+        <artifactId>weld-se-shaded</artifactId>
         <version>${weldVersion}</version>
       </dependency>
 

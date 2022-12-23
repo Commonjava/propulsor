@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015 John Casey (jdcasey@commonjava.org)
+ * Copyright (C) 2014-2022 Red Hat, Inc. (http://github.com/Commonjava/commonjava)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.

@@ -15,22 +15,11 @@
  */
 package org.commonjava.propulsor.deploy.resteasy;
 
-import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
+import io.swagger.jaxrs.listing.ApiListingResource;
+import io.swagger.jaxrs.listing.SwaggerSerializers;
 import io.undertow.servlet.Servlets;
 import io.undertow.servlet.api.DeploymentInfo;
 import io.undertow.servlet.api.ServletInfo;
-
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
-
-import javax.annotation.PostConstruct;
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.inject.Instance;
-import javax.enterprise.inject.spi.BeanManager;
-import javax.inject.Inject;
-import javax.ws.rs.core.Application;
-
 import org.apache.commons.lang.StringUtils;
 import org.commonjava.propulsor.deploy.resteasy.helper.CdiInjectorFactoryImpl;
 import org.commonjava.propulsor.deploy.resteasy.helper.RequestScopeListener;
@@ -41,8 +30,15 @@ import org.jboss.resteasy.spi.ResteasyDeployment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.swagger.jaxrs.listing.ApiListingResource;
-import io.swagger.jaxrs.listing.SwaggerSerializers;
+import javax.annotation.PostConstruct;
+import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.inject.Instance;
+import javax.enterprise.inject.spi.BeanManager;
+import javax.inject.Inject;
+import javax.ws.rs.core.Application;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 // TODO: Is it really right to make this extend Application?? Not sure...
 @ApplicationScoped
@@ -64,10 +60,6 @@ public class ResteasyDeploymentProvider
 
     @Inject
     private BeanManager bmgr;
-
-    // just make sure it loads, dammit
-//    @Inject
-//    private CDIJacksonProvider jacksonProvider;
 
     private Set<Class<?>> resourceClasses;
 
@@ -113,7 +105,7 @@ public class ResteasyDeploymentProvider
         //                  .addAll( providerClasses );
 
         LoggerFactory.getLogger( getClass() )
-                     .debug( "\n\n\n\nRESTEasy DeploymentManager Using BeanManager: {} (@{})\n  with ObjectMapper: {}\n\n\n", bmgr, bmgr.hashCode() );
+                     .debug( "\n\n\n\nRESTEasy DeploymentManager Using BeanManager: {} (@{})\n\n\n", bmgr, bmgr.hashCode() );
 
         deployment.setApplication( this );
         deployment.setInjectorFactoryClass( CdiInjectorFactoryImpl.class.getName() );
@@ -138,7 +130,6 @@ public class ResteasyDeploymentProvider
         // TODO: This might not be right...
         allClasses.addAll( providerClasses );
         allClasses.add( CDIJacksonProvider.class );
-        //allClasses.add( JacksonJsonProvider.class );
         allClasses.addAll( Arrays.asList( ApiListingResource.class, SwaggerSerializers.class ) );
 
         logger.debug( "Returning getClass() with: \n  {}", StringUtils.join( allClasses, "\n  " ) );
